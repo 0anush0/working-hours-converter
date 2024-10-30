@@ -1,51 +1,7 @@
-let autocompleteHome, autocompleteNew;
-
-// Initialize when the document is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if Google Maps is loaded
-    if (typeof google === 'undefined') {
-        console.error('Google Maps failed to load');
-        return;
-    }
-
-    try {
-        const options = {
-            types: ['(cities)'],
-            fields: ['formatted_address', 'geometry', 'name']
-        };
-
-        // Initialize autocomplete
-        autocompleteHome = new google.maps.places.Autocomplete(
-            document.getElementById('homeLocation'),
-            options
-        );
-
-        autocompleteNew = new google.maps.places.Autocomplete(
-            document.getElementById('newLocation'),
-            options
-        );
-
-        // Prevent form submission on enter
-        document.querySelectorAll('.location-input').forEach(input => {
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') e.preventDefault();
-            });
-        });
-
-    } catch (error) {
-        console.error('Error initializing Google Places:', error);
-    }
-});
-
 async function calculateHours() {
     try {
-        if (!autocompleteHome || !autocompleteNew) {
-            showResult('Error: Location search not initialized. Please refresh the page.');
-            return;
-        }
-
-        const homePlace = autocompleteHome.getPlace();
-        const newPlace = autocompleteNew.getPlace();
+        const homePlace = window.autocompleteHome?.getPlace();
+        const newPlace = window.autocompleteNew?.getPlace();
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');
