@@ -1,40 +1,45 @@
+// Global variables
 let autocompleteHome, autocompleteNew;
 
-function initAutocomplete() {
-    if (typeof google === 'undefined') {
-        console.error('Google Maps not loaded');
-        return;
+// Initialize when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Google Maps is loaded
+    if (typeof google !== 'undefined' && google.maps) {
+        setupAutocomplete();
+        setupEventListeners();
+    } else {
+        console.error('Google Maps failed to load');
     }
+});
 
-    try {
-        const options = {
-            types: ['(cities)'],
-            fields: ['formatted_address', 'geometry', 'name']
-        };
+function setupAutocomplete() {
+    const options = {
+        types: ['(cities)'],
+        fields: ['formatted_address', 'geometry', 'name']
+    };
 
-        autocompleteHome = new google.maps.places.Autocomplete(
-            document.getElementById('homeLocation'),
-            options
-        );
+    // Initialize autocomplete for both inputs
+    autocompleteHome = new google.maps.places.Autocomplete(
+        document.getElementById('homeLocation'),
+        options
+    );
 
-        autocompleteNew = new google.maps.places.Autocomplete(
-            document.getElementById('newLocation'),
-            options
-        );
+    autocompleteNew = new google.maps.places.Autocomplete(
+        document.getElementById('newLocation'),
+        options
+    );
+}
 
-        // Prevent form submission on enter
-        document.querySelectorAll('.location-input').forEach(input => {
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') e.preventDefault();
-            });
+function setupEventListeners() {
+    // Prevent form submission on enter
+    document.querySelectorAll('.location-input').forEach(input => {
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') e.preventDefault();
         });
+    });
 
-        // Add click event listener to button
-        document.querySelector('.convert-btn').addEventListener('click', calculateHours);
-
-    } catch (error) {
-        console.error('Error initializing Google Places:', error);
-    }
+    // Add click event listener to button
+    document.querySelector('.convert-btn').addEventListener('click', calculateHours);
 }
 
 async function calculateHours() {
