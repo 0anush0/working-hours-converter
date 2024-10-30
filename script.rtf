@@ -1,15 +1,61 @@
+let autocompleteHome, autocompleteNew;
+
+// Initialize when document loads
+window.onload = function() {
+    initAutocomplete();
+};
+
+function initAutocomplete() {
+    try {
+        const options = {
+            types: ['(cities)'],
+            fields: ['formatted_address', 'geometry', 'name']
+        };
+
+        autocompleteHome = new google.maps.places.Autocomplete(
+            document.getElementById('homeLocation'),
+            options
+        );
+
+        autocompleteNew = new google.maps.places.Autocomplete(
+            document.getElementById('newLocation'),
+            options
+        );
+
+        // Prevent form submission on enter
+        document.querySelectorAll('.location-input').forEach(input => {
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') e.preventDefault();
+            });
+        });
+
+        // Add click event listener to the button
+        document.querySelector('.convert-btn').addEventListener('click', calculateHours);
+
+    } catch (error) {
+        console.error('Error initializing Google Places:', error);
+    }
+}
+
 async function calculateHours() {
     try {
-        const homePlace = window.autocompleteHome?.getPlace();
-        const newPlace = window.autocompleteNew?.getPlace();
+        // Get the selected places
+        const homePlace = autocompleteHome.getPlace();
+        const newPlace = autocompleteNew.getPlace();
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');
             return;
         }
 
+        // Get the input times
         const startTime = document.getElementById('startTime').value;
         const endTime = document.getElementById('endTime').value;
+
+        if (!startTime || !endTime) {
+            showResult('Please enter valid working hours.');
+            return;
+        }
 
         // Get timezone data for both locations
         const homeTz = await getTimezone(
@@ -22,10 +68,8 @@ async function calculateHours() {
             newPlace.geometry.location.lng()
         );
 
-        // Create a date object for the current date
+        // Create date objects for the times
         const now = new Date();
-
-        // Create date objects for start and end times in home timezone
         const [startHours, startMinutes] = startTime.split(':').map(Number);
         const [endHours, endMinutes] = endTime.split(':').map(Number);
 
@@ -50,10 +94,12 @@ async function calculateHours() {
             hour12: true
         });
 
+        // Show the result
         showResult(`
             <div class="result-text">My working hours will be:</div>
             <div class="converted-time">${convertedStart} - ${convertedEnd}</div>
         `);
+
     } catch (error) {
         console.error('Calculation error:', error);
         showResult('Error calculating time difference. Please try again.');
