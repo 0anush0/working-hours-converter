@@ -1,8 +1,5 @@
 let autocompleteHome, autocompleteNew;
 
-// Initialize immediately when script loads
-initAutocomplete();
-
 function initAutocomplete() {
     try {
         const options = {
@@ -10,23 +7,21 @@ function initAutocomplete() {
             fields: ['formatted_address', 'geometry', 'name']
         };
 
-        autocompleteHome = new google.maps.places.Autocomplete(
-            document.getElementById('homeLocation'),
-            options
-        );
+        // Add error checking for element existence
+        const homeInput = document.getElementById('homeLocation');
+        const newInput = document.getElementById('newLocation');
 
-        autocompleteNew = new google.maps.places.Autocomplete(
-            document.getElementById('newLocation'),
-            options
-        );
+        if (homeInput && newInput) {
+            autocompleteHome = new google.maps.places.Autocomplete(homeInput, options);
+            autocompleteNew = new google.maps.places.Autocomplete(newInput, options);
 
-        // Prevent form submission on enter
-        document.querySelectorAll('.location-input').forEach(input => {
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') e.preventDefault();
+            // Prevent form submission on enter
+            [homeInput, newInput].forEach(input => {
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') e.preventDefault();
+                });
             });
-        });
-
+        }
     } catch (error) {
         console.error('Error initializing Google Places:', error);
     }
@@ -34,8 +29,13 @@ function initAutocomplete() {
 
 async function calculateHours() {
     try {
-        const homePlace = autocompleteHome?.getPlace();
-        const newPlace = autocompleteNew?.getPlace();
+        if (!autocompleteHome || !autocompleteNew) {
+            showResult('Error: Location search not initialized. Please refresh the page.');
+            return;
+        }
+
+        const homePlace = autocompleteHome.getPlace();
+        const newPlace = autocompleteNew.getPlace();
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');
