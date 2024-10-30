@@ -8,13 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script>
-        function initMap() {
-            if (typeof google !== 'undefined') {
-                initAutocomplete();
-            }
-        }
-    </script>
+    <!-- Remove the initMap function from head -->
 </head>
 <body>
     <main class="hero">
@@ -49,7 +43,8 @@
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places&callback=initMap" async defer></script>
+    <!-- Load Google Maps API without callback -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
     <script src="script.js"></script>
 </body>
 </html>

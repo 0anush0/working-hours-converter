@@ -1,31 +1,41 @@
 let autocompleteHome, autocompleteNew;
 
-function initAutocomplete() {
+// Initialize when the document is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Google Maps is loaded
+    if (typeof google === 'undefined') {
+        console.error('Google Maps failed to load');
+        return;
+    }
+
     try {
         const options = {
             types: ['(cities)'],
             fields: ['formatted_address', 'geometry', 'name']
         };
 
-        // Add error checking for element existence
-        const homeInput = document.getElementById('homeLocation');
-        const newInput = document.getElementById('newLocation');
+        // Initialize autocomplete
+        autocompleteHome = new google.maps.places.Autocomplete(
+            document.getElementById('homeLocation'),
+            options
+        );
 
-        if (homeInput && newInput) {
-            autocompleteHome = new google.maps.places.Autocomplete(homeInput, options);
-            autocompleteNew = new google.maps.places.Autocomplete(newInput, options);
+        autocompleteNew = new google.maps.places.Autocomplete(
+            document.getElementById('newLocation'),
+            options
+        );
 
-            // Prevent form submission on enter
-            [homeInput, newInput].forEach(input => {
-                input.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') e.preventDefault();
-                });
+        // Prevent form submission on enter
+        document.querySelectorAll('.location-input').forEach(input => {
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') e.preventDefault();
             });
-        }
+        });
+
     } catch (error) {
         console.error('Error initializing Google Places:', error);
     }
-}
+});
 
 async function calculateHours() {
     try {
