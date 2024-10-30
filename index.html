@@ -8,8 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <!-- Load Google Maps API first -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
 </head>
 <body>
     <main class="hero">
@@ -38,12 +36,19 @@
                     <label>If I travel to:</label>
                     <input type="text" id="newLocation" placeholder="Enter destination city" class="location-input">
                 </div>
-                <button class="convert-btn">Show Working Hours</button>
+                <button id="convertButton" class="convert-btn">Show Working Hours</button>
             </div>
 
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
+    <!-- Add initMap function before loading Google Maps API -->
+    <script>
+        function initMap() {
+            initAutocomplete();
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places&callback=initMap" async defer></script>
     <script src="script.js"></script>
 </body>
 </html>

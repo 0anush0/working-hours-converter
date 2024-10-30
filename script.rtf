@@ -1,54 +1,41 @@
-// Global variables
 let autocompleteHome, autocompleteNew;
 
-// Initialize when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if Google Maps is loaded
-    if (typeof google !== 'undefined' && google.maps) {
-        setupAutocomplete();
-        setupEventListeners();
-    } else {
-        console.error('Google Maps failed to load');
-    }
-});
+function initAutocomplete() {
+    try {
+        const options = {
+            types: ['(cities)'],
+            fields: ['formatted_address', 'geometry', 'name']
+        };
 
-function setupAutocomplete() {
-    const options = {
-        types: ['(cities)'],
-        fields: ['formatted_address', 'geometry', 'name']
-    };
+        // Initialize Google Places Autocomplete
+        autocompleteHome = new google.maps.places.Autocomplete(
+            document.getElementById('homeLocation'),
+            options
+        );
 
-    // Initialize autocomplete for both inputs
-    autocompleteHome = new google.maps.places.Autocomplete(
-        document.getElementById('homeLocation'),
-        options
-    );
+        autocompleteNew = new google.maps.places.Autocomplete(
+            document.getElementById('newLocation'),
+            options
+        );
 
-    autocompleteNew = new google.maps.places.Autocomplete(
-        document.getElementById('newLocation'),
-        options
-    );
-}
+        // Add button click event listener
+        document.getElementById('convertButton').addEventListener('click', calculateHours);
 
-function setupEventListeners() {
-    // Prevent form submission on enter
-    document.querySelectorAll('.location-input').forEach(input => {
-        input.addEventListener('keydown', e => {
-            if (e.key === 'Enter') e.preventDefault();
+        // Prevent form submission on enter
+        document.querySelectorAll('.location-input').forEach(input => {
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') e.preventDefault();
+            });
         });
-    });
 
-    // Add click event listener to button
-    document.querySelector('.convert-btn').addEventListener('click', calculateHours);
+    } catch (error) {
+        console.error('Error initializing Google Places:', error);
+    }
 }
 
 async function calculateHours() {
     try {
-        if (!autocompleteHome || !autocompleteNew) {
-            showResult('Error: Location search not initialized. Please refresh the page.');
-            return;
-        }
-
+        // Get the selected places
         const homePlace = autocompleteHome.getPlace();
         const newPlace = autocompleteNew.getPlace();
 
