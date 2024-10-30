@@ -1,17 +1,11 @@
-// Initialize Google Places Autocomplete
-document.addEventListener('DOMContentLoaded', function() {
-    initAutocomplete();
-
-    // Add click event listener to button
-    document.querySelector('.convert-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        calculateHours();
-    });
-});
-
 let autocompleteHome, autocompleteNew;
 
 function initAutocomplete() {
+    if (typeof google === 'undefined') {
+        console.error('Google Maps not loaded');
+        return;
+    }
+
     try {
         const options = {
             types: ['(cities)'],
@@ -35,6 +29,9 @@ function initAutocomplete() {
             });
         });
 
+        // Add click event listener to button
+        document.querySelector('.convert-btn').addEventListener('click', calculateHours);
+
     } catch (error) {
         console.error('Error initializing Google Places:', error);
     }
@@ -42,6 +39,11 @@ function initAutocomplete() {
 
 async function calculateHours() {
     try {
+        if (!autocompleteHome || !autocompleteNew) {
+            showResult('Error: Location search not initialized. Please refresh the page.');
+            return;
+        }
+
         const homePlace = autocompleteHome.getPlace();
         const newPlace = autocompleteNew.getPlace();
 
