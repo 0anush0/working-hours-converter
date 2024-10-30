@@ -1,8 +1,10 @@
+// Initialize Google Places Autocomplete immediately
 let autocompleteHome, autocompleteNew;
 
-document.addEventListener('DOMContentLoaded', function() {
+// Wait for DOM and Google Maps to be fully loaded
+window.onload = function() {
     initAutocomplete();
-});
+};
 
 function initAutocomplete() {
     try {
@@ -21,6 +23,7 @@ function initAutocomplete() {
             options
         );
 
+        // Prevent form submission on enter
         document.querySelectorAll('.location-input').forEach(input => {
             input.addEventListener('keydown', e => {
                 if (e.key === 'Enter') e.preventDefault();
@@ -29,13 +32,14 @@ function initAutocomplete() {
 
     } catch (error) {
         console.error('Error initializing Google Places:', error);
+        showResult('Error loading location search. Please refresh the page.');
     }
 }
 
 async function calculateHours() {
     try {
-        const homePlace = autocompleteHome.getPlace();
-        const newPlace = autocompleteNew.getPlace();
+        const homePlace = autocompleteHome?.getPlace();
+        const newPlace = autocompleteNew?.getPlace();
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');

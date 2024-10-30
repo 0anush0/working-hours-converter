@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Working Hours Converter</title>
+    <title>Working Hours</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -12,7 +12,8 @@
 <body>
     <main class="hero">
         <div class="container">
-            <h1>Working Hours Converter</h1>
+            <h1>Working Hours</h1>
+            <p class="subtitle">See your working hours in different locations</p>
 
             <div class="card">
                 <div class="input-group">
@@ -35,12 +36,13 @@
                     <label>If I travel to:</label>
                     <input type="text" id="newLocation" placeholder="Enter destination city" class="location-input">
                 </div>
-                <button onclick="calculateHours()" class="convert-btn">Convert Time</button>
+                <button onclick="calculateHours()" class="convert-btn">Show Working Hours</button>
             </div>
 
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
+    <!-- Move Google Maps script here and remove async defer -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
     <script src="script.js"></script>
 </body>
