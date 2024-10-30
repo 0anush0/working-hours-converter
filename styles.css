@@ -40,15 +40,29 @@ body {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 20px;
     box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 h1 {
     font-size: 2.8rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     text-align: center;
     color: var(--text-primary);
     font-weight: 700;
     letter-spacing: -0.02em;
+    width: 100%;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+    max-width: 400px;
+    line-height: 1.5;
 }
 
 .card {
@@ -60,6 +74,7 @@ h1 {
     transition: var(--transition);
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
+    width: 100%;
 }
 
 .card:hover {

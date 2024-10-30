@@ -1,5 +1,8 @@
 let autocompleteHome, autocompleteNew;
 
+// Initialize immediately when script loads
+initAutocomplete();
+
 function initAutocomplete() {
     try {
         const options = {
@@ -17,6 +20,7 @@ function initAutocomplete() {
             options
         );
 
+        // Prevent form submission on enter
         document.querySelectorAll('.location-input').forEach(input => {
             input.addEventListener('keydown', e => {
                 if (e.key === 'Enter') e.preventDefault();
@@ -25,7 +29,6 @@ function initAutocomplete() {
 
     } catch (error) {
         console.error('Error initializing Google Places:', error);
-        showResult('Error loading location search. Please refresh the page.');
     }
 }
 
