@@ -1,10 +1,4 @@
-// Initialize Google Places Autocomplete immediately
 let autocompleteHome, autocompleteNew;
-
-// Wait for DOM and Google Maps to be fully loaded
-window.onload = function() {
-    initAutocomplete();
-};
 
 function initAutocomplete() {
     try {
@@ -23,7 +17,6 @@ function initAutocomplete() {
             options
         );
 
-        // Prevent form submission on enter
         document.querySelectorAll('.location-input').forEach(input => {
             input.addEventListener('keydown', e => {
                 if (e.key === 'Enter') e.preventDefault();
