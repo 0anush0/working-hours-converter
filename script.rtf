@@ -1,38 +1,7 @@
-let autocompleteHome, autocompleteNew;
-
-// Initialize when the document is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Google Places Autocomplete
-    const options = {
-        types: ['(cities)'],
-        fields: ['formatted_address', 'geometry', 'name']
-    };
-
-    autocompleteHome = new google.maps.places.Autocomplete(
-        document.getElementById('homeLocation'),
-        options
-    );
-
-    autocompleteNew = new google.maps.places.Autocomplete(
-        document.getElementById('newLocation'),
-        options
-    );
-
-    // Add button click event listener
-    const button = document.getElementById('convertButton');
-    if (button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleCalculation();
-        });
-    }
-});
-
-async function handleCalculation() {
+function calculateHours() {
     try {
-        // Get the selected places
-        const homePlace = autocompleteHome.getPlace();
-        const newPlace = autocompleteNew.getPlace();
+        const homePlace = window.autocompleteHome.getPlace();
+        const newPlace = window.autocompleteNew.getPlace();
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');
@@ -43,6 +12,16 @@ async function handleCalculation() {
         const endTime = document.getElementById('endTime').value;
 
         // Get timezone data for both locations
+        getTimezones(homePlace, newPlace, startTime, endTime);
+
+    } catch (error) {
+        console.error('Calculation error:', error);
+        showResult('Error calculating time difference. Please try again.');
+    }
+}
+
+async function getTimezones(homePlace, newPlace, startTime, endTime) {
+    try {
         const homeTz = await getTimezone(
             homePlace.geometry.location.lat(),
             homePlace.geometry.location.lng()
@@ -53,41 +32,44 @@ async function handleCalculation() {
             newPlace.geometry.location.lng()
         );
 
-        // Create date objects for the times
-        const now = new Date();
-        const [startHours, startMinutes] = startTime.split(':').map(Number);
-        const [endHours, endMinutes] = endTime.split(':').map(Number);
-
-        const startDate = new Date(now);
-        startDate.setHours(startHours, startMinutes, 0, 0);
-
-        const endDate = new Date(now);
-        endDate.setHours(endHours, endMinutes, 0, 0);
-
-        // Convert to destination timezone
-        const convertedStart = startDate.toLocaleTimeString('en-US', {
-            timeZone: newTz.timeZoneId,
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-
-        const convertedEnd = endDate.toLocaleTimeString('en-US', {
-            timeZone: newTz.timeZoneId,
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-
-        showResult(`
-            <div class="result-text">My working hours will be:</div>
-            <div class="converted-time">${convertedStart} - ${convertedEnd}</div>
-        `);
-
+        convertTimes(homeTz, newTz, startTime, endTime);
     } catch (error) {
-        console.error('Calculation error:', error);
-        showResult('Error calculating time difference. Please try again.');
+        console.error('Timezone fetch error:', error);
+        showResult('Error getting timezone data. Please try again.');
     }
+}
+
+function convertTimes(homeTz, newTz, startTime, endTime) {
+    // Create date objects for the times
+    const now = new Date();
+    const [startHours, startMinutes] = startTime.split(':').map(Number);
+    const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+    const startDate = new Date(now);
+    startDate.setHours(startHours, startMinutes, 0, 0);
+
+    const endDate = new Date(now);
+    endDate.setHours(endHours, endMinutes, 0, 0);
+
+    // Convert to destination timezone
+    const convertedStart = startDate.toLocaleTimeString('en-US', {
+        timeZone: newTz.timeZoneId,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    const convertedEnd = endDate.toLocaleTimeString('en-US', {
+        timeZone: newTz.timeZoneId,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    showResult(`
+        <div class="result-text">My working hours will be:</div>
+        <div class="converted-time">${convertedStart} - ${convertedEnd}</div>
+    `);
 }
 
 async function getTimezone(lat, lng) {

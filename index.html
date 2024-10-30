@@ -72,7 +72,9 @@
             });
 
             // Add click event listener to button
-            document.getElementById('convertButton').addEventListener('click', calculateHours);
+            document.getElementById('convertButton').onclick = function() {
+                calculateHours();
+            };
         };
     </script>
     <script src="script.js"></script>
