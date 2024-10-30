@@ -1,9 +1,15 @@
-let autocompleteHome, autocompleteNew;
-
-// Initialize when document loads
-window.onload = function() {
+// Initialize Google Places Autocomplete
+document.addEventListener('DOMContentLoaded', function() {
     initAutocomplete();
-};
+
+    // Add click event listener to button
+    document.querySelector('.convert-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        calculateHours();
+    });
+});
+
+let autocompleteHome, autocompleteNew;
 
 function initAutocomplete() {
     try {
@@ -29,9 +35,6 @@ function initAutocomplete() {
             });
         });
 
-        // Add click event listener to the button
-        document.querySelector('.convert-btn').addEventListener('click', calculateHours);
-
     } catch (error) {
         console.error('Error initializing Google Places:', error);
     }
@@ -39,7 +42,6 @@ function initAutocomplete() {
 
 async function calculateHours() {
     try {
-        // Get the selected places
         const homePlace = autocompleteHome.getPlace();
         const newPlace = autocompleteNew.getPlace();
 
@@ -48,14 +50,8 @@ async function calculateHours() {
             return;
         }
 
-        // Get the input times
         const startTime = document.getElementById('startTime').value;
         const endTime = document.getElementById('endTime').value;
-
-        if (!startTime || !endTime) {
-            showResult('Please enter valid working hours.');
-            return;
-        }
 
         // Get timezone data for both locations
         const homeTz = await getTimezone(
@@ -94,7 +90,6 @@ async function calculateHours() {
             hour12: true
         });
 
-        // Show the result
         showResult(`
             <div class="result-text">My working hours will be:</div>
             <div class="converted-time">${convertedStart} - ${convertedEnd}</div>

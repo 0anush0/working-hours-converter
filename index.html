@@ -42,36 +42,7 @@
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
-    <!-- Load the Places library first -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
-    <!-- Load your script after -->
-    <script>
-        // Initialize Google Places Autocomplete
-        window.onload = function() {
-            const options = {
-                types: ['(cities)'],
-                fields: ['formatted_address', 'geometry', 'name']
-            };
-
-            // Initialize autocomplete for both inputs
-            window.autocompleteHome = new google.maps.places.Autocomplete(
-                document.getElementById('homeLocation'),
-                options
-            );
-
-            window.autocompleteNew = new google.maps.places.Autocomplete(
-                document.getElementById('newLocation'),
-                options
-            );
-
-            // Prevent form submission on enter
-            document.querySelectorAll('.location-input').forEach(input => {
-                input.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') e.preventDefault();
-                });
-            });
-        };
-    </script>
     <script src="script.js"></script>
 </body>
 </html>
