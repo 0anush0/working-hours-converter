@@ -42,109 +42,39 @@
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
-
-    <!-- Load Google Maps API directly -->
+    <!-- Load Google Maps API first -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
-    <script src="script.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Working Hours</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <main class="hero">
-        <div class="container">
-            <h1>Working Hours</h1>
-            <p class="subtitle">See your working hours in different locations</p>
+    <!-- Load your script after -->
+    <script>
+        // Initialize Google Places Autocomplete
+        window.onload = function() {
+            const options = {
+                types: ['(cities)'],
+                fields: ['formatted_address', 'geometry', 'name']
+            };
 
-            <div class="card">
-                <div class="input-group">
-                    <label>My work is based in:</label>
-                    <input type="text" id="homeLocation" placeholder="Enter your city" class="location-input">
-                </div>
+            // Initialize autocomplete for both inputs
+            window.autocompleteHome = new google.maps.places.Autocomplete(
+                document.getElementById('homeLocation'),
+                options
+            );
 
-                <div class="input-group">
-                    <label>My working hours are:</label>
-                    <div class="time-wrapper">
-                        <input type="time" id="startTime" value="09:00">
-                        <span class="time-separator">to</span>
-                        <input type="time" id="endTime" value="17:00">
-                    </div>
-                </div>
-            </div>
+            window.autocompleteNew = new google.maps.places.Autocomplete(
+                document.getElementById('newLocation'),
+                options
+            );
 
-            <div class="card">
-                <div class="input-group">
-                    <label>If I travel to:</label>
-                    <input type="text" id="newLocation" placeholder="Enter destination city" class="location-input">
-                </div>
-                <button id="convertButton" class="convert-btn">Show Working Hours</button>
-            </div>
+            // Prevent form submission on enter
+            document.querySelectorAll('.location-input').forEach(input => {
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') e.preventDefault();
+                });
+            });
 
-            <div id="result" class="card result-hidden"></div>
-        </div>
-    </main>
-
-    <!-- Load Google Maps API directly -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
-    <script src="script.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Working Hours</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <main class="hero">
-        <div class="container">
-            <h1>Working Hours</h1>
-            <p class="subtitle">See your working hours in different locations</p>
-
-            <div class="card">
-                <div class="input-group">
-                    <label>My work is based in:</label>
-                    <input type="text" id="homeLocation" placeholder="Enter your city" class="location-input">
-                </div>
-
-                <div class="input-group">
-                    <label>My working hours are:</label>
-                    <div class="time-wrapper">
-                        <input type="time" id="startTime" value="09:00">
-                        <span class="time-separator">to</span>
-                        <input type="time" id="endTime" value="17:00">
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="input-group">
-                    <label>If I travel to:</label>
-                    <input type="text" id="newLocation" placeholder="Enter destination city" class="location-input">
-                </div>
-                <button id="convertButton" class="convert-btn">Show Working Hours</button>
-            </div>
-
-            <div id="result" class="card result-hidden"></div>
-        </div>
-    </main>
-
-    <!-- Load Google Maps API directly -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
+            // Add click event listener to button
+            document.getElementById('convertButton').addEventListener('click', calculateHours);
+        };
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
