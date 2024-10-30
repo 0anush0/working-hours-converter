@@ -56,24 +56,33 @@ async function calculateHours() {
             newPlace.geometry.location.lng()
         );
 
-        // Calculate total offset for each location (rawOffset + dstOffset)
-        const homeOffset = (homeTz.rawOffset + homeTz.dstOffset) / 3600; // Convert to hours
-        const newOffset = (newTz.rawOffset + newTz.dstOffset) / 3600;   // Convert to hours
+        // Create a date object for the current date
+        const now = new Date();
 
-        // Calculate time difference between locations
-        const hoursDiff = newOffset - homeOffset;
-
-        // Convert times
+        // Create date objects for start and end times in home timezone
         const [startHours, startMinutes] = startTime.split(':').map(Number);
         const [endHours, endMinutes] = endTime.split(':').map(Number);
 
-        // Add the difference to both times
-        let newStartHours = startHours + hoursDiff;
-        let newEndHours = endHours + hoursDiff;
+        const startDate = new Date(now);
+        startDate.setHours(startHours, startMinutes, 0, 0);
 
-        // Format the converted times
-        const convertedStart = formatTime(newStartHours, startMinutes);
-        const convertedEnd = formatTime(newEndHours, endMinutes);
+        const endDate = new Date(now);
+        endDate.setHours(endHours, endMinutes, 0, 0);
+
+        // Convert to destination timezone
+        const convertedStart = startDate.toLocaleTimeString('en-US', {
+            timeZone: newTz.timeZoneId,
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        const convertedEnd = endDate.toLocaleTimeString('en-US', {
+            timeZone: newTz.timeZoneId,
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
 
         showResult(`
             <div class="result-text">My working hours will be:</div>
@@ -83,21 +92,6 @@ async function calculateHours() {
         console.error('Calculation error:', error);
         showResult('Error calculating time difference. Please try again.');
     }
-}
-
-function formatTime(hours, minutes) {
-    // Handle hour wraparound
-    while (hours < 0) hours += 24;
-    while (hours >= 24) hours -= 24;
-
-    let period = 'AM';
-    if (hours >= 12) {
-        period = 'PM';
-        if (hours > 12) hours -= 12;
-    }
-    if (hours === 0) hours = 12;
-
-    return `${Math.floor(hours)}:${minutes.toString().padStart(2, '0')} ${period}`;
 }
 
 async function getTimezone(lat, lng) {
@@ -112,4 +106,15 @@ async function getTimezone(lat, lng) {
         const data = await response.json();
         if (data.status !== 'OK') throw new Error(data.status);
 
-        return data;  // Return the full
+        return data;
+    } catch (error) {
+        console.error('Timezone fetch error:', error);
+        throw error;
+    }
+}
+
+function showResult(message) {
+    const result = document.getElementById('result');
+    result.innerHTML = message;
+    result.classList.add('active');
+}
