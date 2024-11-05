@@ -70,16 +70,15 @@
                     if (e.key === 'Enter') e.preventDefault();
                 });
             });
-        };
 
-        // Add button event listener separately
-        document.addEventListener('DOMContentLoaded', function() {
+            // Add button click handler here
             const button = document.getElementById('convertButton');
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                calculateHours();
-            });
-        });
+            if (button) {
+                button.onclick = function() {
+                    window.calculateHours();
+                };
+            }
+        };
     </script>
     <script src="script.js"></script>
 </body>
