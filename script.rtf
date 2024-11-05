@@ -1,13 +1,13 @@
-// Global variables
 let autocompleteHome, autocompleteNew;
 
-// Initialize function that Google Maps will call
-function initMap() {
-    console.log('Initializing map...');
+// Initialize the application
+function initializeApp() {
+    console.log('Initializing application...');
     setupAutocomplete();
     setupEventListeners();
 }
 
+// Setup Google Places Autocomplete
 function setupAutocomplete() {
     console.log('Setting up autocomplete...');
     const options = {
@@ -26,6 +26,7 @@ function setupAutocomplete() {
     );
 }
 
+// Setup event listeners
 function setupEventListeners() {
     console.log('Setting up event listeners...');
     // Prevent form submission on enter
@@ -38,13 +39,20 @@ function setupEventListeners() {
     // Add click handler to button
     const button = document.getElementById('convertButton');
     if (button) {
-        button.addEventListener('click', calculateHours);
+        button.addEventListener('click', handleCalculateClick);
         console.log('Button click handler added');
     }
 }
 
+// Handle button click
+function handleCalculateClick(e) {
+    e.preventDefault();
+    console.log('Calculate button clicked');
+    calculateHours();
+}
+
 async function calculateHours() {
-    console.log('Calculate hours called');
+    console.log('Calculating hours...');
     try {
         const homePlace = autocompleteHome.getPlace();
         const newPlace = autocompleteNew.getPlace();

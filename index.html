@@ -8,6 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Add initMap function before loading Google Maps API -->
+    <script>
+        function initMap() {
+            // This function will be called when Google Maps loads
+            console.log('Google Maps loaded');
+            initializeApp();
+        }
+    </script>
 </head>
 <body>
     <main class="hero">
@@ -43,8 +51,9 @@
         </div>
     </main>
 
-    <!-- Load scripts -->
+    <!-- Load your script first -->
     <script src="script.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places&callback=initMap"></script>
+    <!-- Load Google Maps API with callback -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places&callback=initMap" async defer></script>
 </body>
 </html>
