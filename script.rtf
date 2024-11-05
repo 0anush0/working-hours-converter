@@ -1,6 +1,8 @@
+console.log('Script.js loaded'); // Debug log
+
 // Make calculateHours globally accessible
 window.calculateHours = async function() {
-    console.log('Calculating hours...'); // Debug log
+    console.log('calculateHours function called'); // Debug log
 
     try {
         if (!window.autocompleteHome || !window.autocompleteNew) {
@@ -9,8 +11,12 @@ window.calculateHours = async function() {
             return;
         }
 
+        console.log('Getting places...'); // Debug log
         const homePlace = window.autocompleteHome.getPlace();
         const newPlace = window.autocompleteNew.getPlace();
+
+        console.log('Home place:', homePlace); // Debug log
+        console.log('New place:', newPlace); // Debug log
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');
@@ -20,12 +26,10 @@ window.calculateHours = async function() {
         const startTime = document.getElementById('startTime').value;
         const endTime = document.getElementById('endTime').value;
 
-        if (!startTime || !endTime) {
-            showResult('Please select valid times.');
-            return;
-        }
+        console.log('Times retrieved:', { startTime, endTime }); // Debug log
 
         // Get timezone data for both locations
+        console.log('Fetching timezone data...'); // Debug log
         const homeTz = await getTimezone(
             homePlace.geometry.location.lat(),
             homePlace.geometry.location.lng()
@@ -35,6 +39,8 @@ window.calculateHours = async function() {
             newPlace.geometry.location.lat(),
             newPlace.geometry.location.lng()
         );
+
+        console.log('Timezone data:', { homeTz, newTz }); // Debug log
 
         // Create date objects for the times
         const now = new Date();
@@ -46,6 +52,8 @@ window.calculateHours = async function() {
 
         const endDate = new Date(now);
         endDate.setHours(endHours, endMinutes, 0, 0);
+
+        console.log('Date objects created:', { startDate, endDate }); // Debug log
 
         // Convert to destination timezone
         const convertedStart = startDate.toLocaleTimeString('en-US', {
@@ -62,6 +70,8 @@ window.calculateHours = async function() {
             hour12: true
         });
 
+        console.log('Converted times:', { convertedStart, convertedEnd }); // Debug log
+
         showResult(`
             <div class="result-text">My working hours will be:</div>
             <div class="converted-time">${convertedStart} - ${convertedEnd}</div>
@@ -74,6 +84,7 @@ window.calculateHours = async function() {
 }
 
 async function getTimezone(lat, lng) {
+    console.log('Getting timezone for coordinates:', { lat, lng }); // Debug log
     try {
         const timestamp = Math.floor(Date.now() / 1000);
         const response = await fetch(
@@ -83,6 +94,8 @@ async function getTimezone(lat, lng) {
         if (!response.ok) throw new Error('Timezone API request failed');
 
         const data = await response.json();
+        console.log('Timezone API response:', data); // Debug log
+
         if (data.status !== 'OK') throw new Error(data.status);
 
         return data;
@@ -93,7 +106,10 @@ async function getTimezone(lat, lng) {
 }
 
 function showResult(message) {
+    console.log('Showing result:', message); // Debug log
     const result = document.getElementById('result');
     result.innerHTML = message;
     result.classList.add('active');
 }
+
+console.log('Script.js finished loading'); // Debug log

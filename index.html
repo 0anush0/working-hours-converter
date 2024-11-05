@@ -46,8 +46,12 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
     <!-- Load your script after -->
     <script>
+        console.log('Script initialization started'); // Debug log
+
         // Initialize Google Places Autocomplete
         window.onload = function() {
+            console.log('Window loaded'); // Debug log
+
             const options = {
                 types: ['(cities)'],
                 fields: ['formatted_address', 'geometry', 'name']
@@ -58,11 +62,13 @@
                 document.getElementById('homeLocation'),
                 options
             );
+            console.log('Home autocomplete initialized'); // Debug log
 
             window.autocompleteNew = new google.maps.places.Autocomplete(
                 document.getElementById('newLocation'),
                 options
             );
+            console.log('New location autocomplete initialized'); // Debug log
 
             // Prevent form submission on enter
             document.querySelectorAll('.location-input').forEach(input => {
@@ -74,9 +80,19 @@
             // Add button click handler here
             const button = document.getElementById('convertButton');
             if (button) {
-                button.onclick = function() {
-                    window.calculateHours();
-                };
+                console.log('Button found, adding click handler'); // Debug log
+                button.addEventListener('click', function(e) {
+                    console.log('Button clicked'); // Debug log
+                    e.preventDefault();
+                    if (typeof window.calculateHours === 'function') {
+                        console.log('Calling calculateHours function'); // Debug log
+                        window.calculateHours();
+                    } else {
+                        console.error('calculateHours function not found');
+                    }
+                });
+            } else {
+                console.error('Convert button not found');
             }
         };
     </script>
