@@ -1,22 +1,53 @@
-console.log('Script.js loaded'); // Debug log
+// Global variables
+let autocompleteHome, autocompleteNew;
 
-// Make calculateHours globally accessible
-window.calculateHours = async function() {
-    console.log('calculateHours function called'); // Debug log
+// Initialize function that Google Maps will call
+function initMap() {
+    console.log('Initializing map...');
+    setupAutocomplete();
+    setupEventListeners();
+}
 
+function setupAutocomplete() {
+    console.log('Setting up autocomplete...');
+    const options = {
+        types: ['(cities)'],
+        fields: ['formatted_address', 'geometry', 'name']
+    };
+
+    autocompleteHome = new google.maps.places.Autocomplete(
+        document.getElementById('homeLocation'),
+        options
+    );
+
+    autocompleteNew = new google.maps.places.Autocomplete(
+        document.getElementById('newLocation'),
+        options
+    );
+}
+
+function setupEventListeners() {
+    console.log('Setting up event listeners...');
+    // Prevent form submission on enter
+    document.querySelectorAll('.location-input').forEach(input => {
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') e.preventDefault();
+        });
+    });
+
+    // Add click handler to button
+    const button = document.getElementById('convertButton');
+    if (button) {
+        button.addEventListener('click', calculateHours);
+        console.log('Button click handler added');
+    }
+}
+
+async function calculateHours() {
+    console.log('Calculate hours called');
     try {
-        if (!window.autocompleteHome || !window.autocompleteNew) {
-            console.error('Autocomplete not initialized');
-            showResult('Error: Location search not initialized. Please refresh the page.');
-            return;
-        }
-
-        console.log('Getting places...'); // Debug log
-        const homePlace = window.autocompleteHome.getPlace();
-        const newPlace = window.autocompleteNew.getPlace();
-
-        console.log('Home place:', homePlace); // Debug log
-        console.log('New place:', newPlace); // Debug log
+        const homePlace = autocompleteHome.getPlace();
+        const newPlace = autocompleteNew.getPlace();
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');
@@ -26,10 +57,7 @@ window.calculateHours = async function() {
         const startTime = document.getElementById('startTime').value;
         const endTime = document.getElementById('endTime').value;
 
-        console.log('Times retrieved:', { startTime, endTime }); // Debug log
-
         // Get timezone data for both locations
-        console.log('Fetching timezone data...'); // Debug log
         const homeTz = await getTimezone(
             homePlace.geometry.location.lat(),
             homePlace.geometry.location.lng()
@@ -39,8 +67,6 @@ window.calculateHours = async function() {
             newPlace.geometry.location.lat(),
             newPlace.geometry.location.lng()
         );
-
-        console.log('Timezone data:', { homeTz, newTz }); // Debug log
 
         // Create date objects for the times
         const now = new Date();
@@ -52,8 +78,6 @@ window.calculateHours = async function() {
 
         const endDate = new Date(now);
         endDate.setHours(endHours, endMinutes, 0, 0);
-
-        console.log('Date objects created:', { startDate, endDate }); // Debug log
 
         // Convert to destination timezone
         const convertedStart = startDate.toLocaleTimeString('en-US', {
@@ -70,8 +94,6 @@ window.calculateHours = async function() {
             hour12: true
         });
 
-        console.log('Converted times:', { convertedStart, convertedEnd }); // Debug log
-
         showResult(`
             <div class="result-text">My working hours will be:</div>
             <div class="converted-time">${convertedStart} - ${convertedEnd}</div>
@@ -84,7 +106,6 @@ window.calculateHours = async function() {
 }
 
 async function getTimezone(lat, lng) {
-    console.log('Getting timezone for coordinates:', { lat, lng }); // Debug log
     try {
         const timestamp = Math.floor(Date.now() / 1000);
         const response = await fetch(
@@ -94,8 +115,6 @@ async function getTimezone(lat, lng) {
         if (!response.ok) throw new Error('Timezone API request failed');
 
         const data = await response.json();
-        console.log('Timezone API response:', data); // Debug log
-
         if (data.status !== 'OK') throw new Error(data.status);
 
         return data;
@@ -106,10 +125,7 @@ async function getTimezone(lat, lng) {
 }
 
 function showResult(message) {
-    console.log('Showing result:', message); // Debug log
     const result = document.getElementById('result');
     result.innerHTML = message;
     result.classList.add('active');
 }
-
-console.log('Script.js finished loading'); // Debug log
