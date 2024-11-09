@@ -147,12 +147,10 @@
         </div>
     </main>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
     <script>
-        // The JavaScript remains unchanged
         let autocompleteHome, autocompleteNew;
 
-        function initAutocomplete() {
+        function initMap() {
             const options = {
                 types: ['(cities)'],
                 fields: ['formatted_address', 'geometry', 'name']
@@ -251,8 +249,7 @@
             result.classList.remove('result-hidden');
             result.classList.add('active');
         }
-
-        window.onload = initAutocomplete;
     </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places&callback=initMap"></script>
 </body>
 </html>
