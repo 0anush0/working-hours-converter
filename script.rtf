@@ -1,61 +1,34 @@
-let autocompleteHome, autocompleteNew;
-
-// Initialize the application
-function initializeApp() {
-    console.log('Initializing application...');
-    setupAutocomplete();
-    setupEventListeners();
-}
-
-// Setup Google Places Autocomplete
-function setupAutocomplete() {
-    console.log('Setting up autocomplete...');
+// Initialize Google Places Autocomplete
+window.onload = function() {
     const options = {
         types: ['(cities)'],
         fields: ['formatted_address', 'geometry', 'name']
     };
 
-    autocompleteHome = new google.maps.places.Autocomplete(
+    // Initialize autocomplete for both inputs
+    window.autocompleteHome = new google.maps.places.Autocomplete(
         document.getElementById('homeLocation'),
         options
     );
 
-    autocompleteNew = new google.maps.places.Autocomplete(
+    window.autocompleteNew = new google.maps.places.Autocomplete(
         document.getElementById('newLocation'),
         options
     );
-}
 
-// Setup event listeners
-function setupEventListeners() {
-    console.log('Setting up event listeners...');
     // Prevent form submission on enter
     document.querySelectorAll('.location-input').forEach(input => {
         input.addEventListener('keydown', e => {
             if (e.key === 'Enter') e.preventDefault();
         });
     });
-
-    // Add click handler to button
-    const button = document.getElementById('convertButton');
-    if (button) {
-        button.addEventListener('click', handleCalculateClick);
-        console.log('Button click handler added');
-    }
-}
+};
 
 // Handle button click
-function handleCalculateClick(e) {
-    e.preventDefault();
-    console.log('Calculate button clicked');
-    calculateHours();
-}
-
-async function calculateHours() {
-    console.log('Calculating hours...');
+async function handleCalculateClick() {
     try {
-        const homePlace = autocompleteHome.getPlace();
-        const newPlace = autocompleteNew.getPlace();
+        const homePlace = window.autocompleteHome.getPlace();
+        const newPlace = window.autocompleteNew.getPlace();
 
         if (!homePlace || !newPlace) {
             showResult('Please select valid cities from the dropdown suggestions.');
@@ -76,31 +49,13 @@ async function calculateHours() {
             newPlace.geometry.location.lng()
         );
 
-        // Create date objects for the times
-        const now = new Date();
-        const [startHours, startMinutes] = startTime.split(':').map(Number);
-        const [endHours, endMinutes] = endTime.split(':').map(Number);
-
-        const startDate = new Date(now);
-        startDate.setHours(startHours, startMinutes, 0, 0);
-
-        const endDate = new Date(now);
-        endDate.setHours(endHours, endMinutes, 0, 0);
-
-        // Convert to destination timezone
-        const convertedStart = startDate.toLocaleTimeString('en-US', {
-            timeZone: newTz.timeZoneId,
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-
-        const convertedEnd = endDate.toLocaleTimeString('en-US', {
-            timeZone: newTz.timeZoneId,
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
+        // Convert working hours
+        const [convertedStart, convertedEnd] = convertWorkingHours(
+            homeTz.timeZoneId,
+            startTime,
+            endTime,
+            newTz.timeZoneId
+        );
 
         showResult(`
             <div class="result-text">My working hours will be:</div>
@@ -130,6 +85,22 @@ async function getTimezone(lat, lng) {
         console.error('Timezone fetch error:', error);
         throw error;
     }
+}
+
+function convertWorkingHours(homeTimezone, workStart, workEnd, destinationTimezone) {
+    const today = new Date();
+    const [startHours, startMinutes] = workStart.split(':').map(Number);
+    const [endHours, endMinutes] = workEnd.split(':').map(Number);
+
+    const workStartTime = new Date(today.setHours(startHours, startMinutes, 0, 0));
+    const workEndTime = new Date(today.setHours(endHours, endMinutes, 0, 0));
+
+    const options = { timeZone: destinationTimezone, hour: 'numeric', minute: '2-digit', hour12: true };
+
+    const convertedStart = workStartTime.toLocaleTimeString('en-US', options);
+    const convertedEnd = workEndTime.toLocaleTimeString('en-US', options);
+
+    return [convertedStart, convertedEnd];
 }
 
 function showResult(message) {
