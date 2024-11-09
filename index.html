@@ -211,11 +211,28 @@
                 const newEnd = new Date(homeEnd.getTime() + (newTz.rawOffset - homeTz.rawOffset) * 1000);
 
                 const formatOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+                const dateFormatOptions = { weekday: 'short', month: 'short', day: 'numeric' };
+
+                const homeDayDifference = homeEnd.getDate() - homeStart.getDate();
+                const newDayDifference = newEnd.getDate() - newStart.getDate();
+
+                let homeTimeString = `${homeStart.toLocaleTimeString('en-US', formatOptions)} - ${homeEnd.toLocaleTimeString('en-US', formatOptions)}`;
+                let newTimeString = `${newStart.toLocaleTimeString('en-US', formatOptions)} - ${newEnd.toLocaleTimeString('en-US', formatOptions)}`;
+
+                if (homeDayDifference !== 0) {
+                    homeTimeString += ` (Next day)`;
+                }
+
+                if (newDayDifference !== 0) {
+                    newTimeString += ` (Next day)`;
+                }
 
                 showResult(`
                     <div class="result-text">Working hours:</div>
-                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}): ${homeStart.toLocaleTimeString('en-US', formatOptions)} - ${homeEnd.toLocaleTimeString('en-US', formatOptions)}</div>
-                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}): ${newStart.toLocaleTimeString('en-US', formatOptions)} - ${newEnd.toLocaleTimeString('en-US', formatOptions)}</div>
+                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}): ${homeTimeString}</div>
+                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}): ${newTimeString}</div>
+                    <div class="converted-time">Date in ${homePlace.name}: ${homeStart.toLocaleDateString('en-US', dateFormatOptions)}</div>
+                    <div class="converted-time">Date in ${newPlace.name}: ${newStart.toLocaleDateString('en-US', dateFormatOptions)}</div>
                 `);
 
             } catch (error) {
