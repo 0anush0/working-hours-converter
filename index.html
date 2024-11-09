@@ -10,34 +10,29 @@
             font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
             background-color: #008080;
             color: #000000;
-            line-height: 1.6;
+            line-height: 1.4;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 500px;
+            margin: auto;
             background-color: #C0C0C0;
             border: 2px solid #FFFFFF;
             border-right-color: #808080;
             border-bottom-color: #808080;
-            padding: 2px;
+            padding: 5px;
         }
         .title-bar {
             background-color: #000080;
             color: #FFFFFF;
-            padding: 2px 4px;
+            padding: 4px;
             font-weight: bold;
             font-size: 14px;
         }
-        h1 {
-            font-size: 20px;
-            color: #000000;
-            margin: 10px 0;
-        }
         .subtitle {
             color: #000000;
-            margin-bottom: 20px;
+            margin: 8px 0;
             font-size: 14px;
         }
         .card {
@@ -45,15 +40,18 @@
             border: 2px solid #FFFFFF;
             border-right-color: #808080;
             border-bottom-color: #808080;
-            padding: 10px;
-            margin-bottom: 20px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .card:last-child {
+            margin-bottom: 0;
         }
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             font-size: 14px;
         }
         input[type="text"],
@@ -69,6 +67,7 @@
         .time-wrapper {
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
         .time-separator {
             margin: 0 10px;
@@ -82,12 +81,13 @@
             border: 2px solid #FFFFFF;
             border-right-color: #808080;
             border-bottom-color: #808080;
-            padding: 4px;
-            font-size: 14px;
+            padding: 6px;
+            font-size: 12px;
             font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
             cursor: pointer;
             position: relative;
             outline: 1px solid #000000;
+            margin-top: 10px;
         }
         .convert-btn:active {
             border: 2px solid #808080;
@@ -100,14 +100,15 @@
         }
         .result.active {
             display: block;
+            margin-top: 10px;
         }
         .result-text {
             font-weight: bold;
             margin-bottom: 10px;
-            font-size: 14px;
+            font-size: 13px;
         }
         .converted-time {
-            font-size: 14px;
+            font-size: 12px;
             margin-bottom: 10px;
         }
     </style>
@@ -116,7 +117,6 @@
     <main class="hero">
         <div class="container">
             <div class="title-bar">working_hours.exe</div>
-            <h1>Working Hours</h1>
             <p class="subtitle">See your working hours in different locations</p>
 
             <div class="card">
