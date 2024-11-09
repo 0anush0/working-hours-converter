@@ -36,26 +36,26 @@
                     <label>If I travel to:</label>
                     <input type="text" id="newLocation" placeholder="Enter destination city" class="location-input">
                 </div>
-                <button id="convertButton" class="convert-btn">Show Working Hours</button>
+                <button onclick="handleCalculateClick()" class="convert-btn">Show Working Hours</button>
             </div>
 
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
 
-    <!-- Load Google Maps API -->
+    <!-- Load Google Maps API first -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
 
     <!-- Initialize the app -->
     <script>
-        // Initialize when document is ready
-        document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Google Places Autocomplete
+        window.onload = function() {
             const options = {
                 types: ['(cities)'],
                 fields: ['formatted_address', 'geometry', 'name']
             };
 
-            // Initialize autocomplete
+            // Initialize autocomplete for both inputs
             window.autocompleteHome = new google.maps.places.Autocomplete(
                 document.getElementById('homeLocation'),
                 options
@@ -66,12 +66,102 @@
                 options
             );
 
-            // Add button click handler
-            document.getElementById('convertButton').addEventListener('click', calculateHours);
-        });
-    </script>
+            // Prevent form submission on enter
+            document.querySelectorAll('.location-input').forEach(input => {
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') e.preventDefault();
+                });
+            });
+        };
 
-    <!-- Load your application script -->
-    <script src="/script.js"></script>
+        // Handle button click
+        async function handleCalculateClick() {
+            console.log('Button clicked');
+
+            try {
+                const homePlace = window.autocompleteHome.getPlace();
+                const newPlace = window.autocompleteNew.getPlace();
+
+                if (!homePlace || !newPlace) {
+                    showResult('Please select valid cities from the dropdown suggestions.');
+                    return;
+                }
+
+                const startTime = document.getElementById('startTime').value;
+                const endTime = document.getElementById('endTime').value;
+
+                // Get timezone data for both locations
+                const homeTz = await getTimezone(
+                    homePlace.geometry.location.lat(),
+                    homePlace.geometry.location.lng()
+                );
+
+                const newTz = await getTimezone(
+                    newPlace.geometry.location.lat(),
+                    newPlace.geometry.location.lng()
+                );
+
+                // Create date objects for the times
+                const now = new Date();
+                const [startHours, startMinutes] = startTime.split(':').map(Number);
+                const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+                const startDate = new Date(now);
+                startDate.setHours(startHours, startMinutes, 0, 0);
+
+                const endDate = new Date(now);
+                endDate.setHours(endHours, endMinutes, 0, 0);
+
+                // Convert to destination timezone
+                const convertedStart = startDate.toLocaleTimeString('en-US', {
+                    timeZone: newTz.timeZoneId,
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                const convertedEnd = endDate.toLocaleTimeString('en-US', {
+                    timeZone: newTz.timeZoneId,
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                showResult(`
+                    <div class="result-text">My working hours will be:</div>
+                    <div class="converted-time">${convertedStart} - ${convertedEnd}</div>
+                `);
+
+            } catch (error) {
+                console.error('Calculation error:', error);
+                showResult('Error calculating time difference. Please try again.');
+            }
+        }
+
+        async function getTimezone(lat, lng) {
+            try {
+                const timestamp = Math.floor(Date.now() / 1000);
+                const response = await fetch(
+                    `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lng}&timestamp=${timestamp}&key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU`
+                );
+
+                if (!response.ok) throw new Error('Timezone API request failed');
+
+                const data = await response.json();
+                if (data.status !== 'OK') throw new Error(data.status);
+
+                return data;
+            } catch (error) {
+                console.error('Timezone fetch error:', error);
+                throw error;
+            }
+        }
+
+        function showResult(message) {
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.classList.add('active');
+        }
+    </script>
 </body>
 </html>
