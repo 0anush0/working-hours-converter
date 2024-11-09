@@ -179,9 +179,13 @@
                     newPlace.geometry.location.lng()
                 );
 
-                // Create Date objects for start and end times in the home timezone
-                const homeStart = new Date(`2024-01-01T${startTime}:00${homeTz.rawOffset / 3600}:00`);
-                const homeEnd = new Date(`2024-01-01T${endTime}:00${homeTz.rawOffset / 3600}:00`);
+                // Create Date objects for start and end times
+                const now = new Date();
+                const [startHours, startMinutes] = startTime.split(':').map(Number);
+                const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+                const homeStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHours, startMinutes);
+                const homeEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHours, endMinutes);
 
                 // Convert times to the destination timezone
                 const newStart = new Date(homeStart.getTime() + (newTz.rawOffset - homeTz.rawOffset) * 1000);
