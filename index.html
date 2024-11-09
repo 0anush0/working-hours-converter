@@ -101,16 +101,22 @@
                     newPlace.geometry.location.lng()
                 );
 
+                // Calculate the time difference between home and destination
+                const homeOffset = homeTz.rawOffset + homeTz.dstOffset;
+                const newOffset = newTz.rawOffset + newTz.dstOffset;
+                const diffInHours = (newOffset - homeOffset) / 3600;
+
                 // Create date objects for the times
                 const now = new Date();
                 const [startHours, startMinutes] = startTime.split(':').map(Number);
                 const [endHours, endMinutes] = endTime.split(':').map(Number);
 
+                // Adjust for timezone difference
                 const startDate = new Date(now);
-                startDate.setHours(startHours, startMinutes, 0, 0);
+                startDate.setHours(startHours - diffInHours, startMinutes, 0, 0);
 
                 const endDate = new Date(now);
-                endDate.setHours(endHours, endMinutes, 0, 0);
+                endDate.setHours(endHours - diffInHours, endMinutes, 0, 0);
 
                 // Convert to destination timezone
                 const convertedStart = startDate.toLocaleTimeString('en-US', {
@@ -125,6 +131,16 @@
                     hour: 'numeric',
                     minute: '2-digit',
                     hour12: true
+                });
+
+                console.log('Time conversion:', {
+                    original: `${startTime}-${endTime}`,
+                    converted: `${convertedStart}-${convertedEnd}`,
+                    diffInHours,
+                    homeOffset,
+                    newOffset,
+                    homeTz,
+                    newTz
                 });
 
                 showResult(`
