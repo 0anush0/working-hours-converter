@@ -15,7 +15,7 @@
 
             <div class="card">
                 <div class="input-group">
-                    <label for="homeLocation">My work is based in:</label>
+                    <label>My work is based in:</label>
                     <input type="text" id="homeLocation" placeholder="Enter your city" class="location-input">
                 </div>
 
@@ -31,51 +31,54 @@
 
             <div class="card">
                 <div class="input-group">
-                    <label for="newLocation">If I travel to:</label>
+                    <label>If I travel to:</label>
                     <input type="text" id="newLocation" placeholder="Enter destination city" class="location-input">
                 </div>
-                <button id="calculateBtn" class="convert-btn">Show Working Hours</button>
+                <button onclick="handleCalculateClick()" class="convert-btn">Show Working Hours</button>
             </div>
 
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places&callback=initAutocomplete" async defer></script>
-    <script>
-        let autocompleteHome, autocompleteNew;
+    <!-- Load Google Maps API first -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
 
-        function initAutocomplete() {
+    <!-- Initialize the app -->
+    <script>
+        // Initialize Google Places Autocomplete
+        window.onload = function() {
             const options = {
                 types: ['(cities)'],
                 fields: ['formatted_address', 'geometry', 'name']
             };
 
-            autocompleteHome = new google.maps.places.Autocomplete(
+            // Initialize autocomplete for both inputs
+            window.autocompleteHome = new google.maps.places.Autocomplete(
                 document.getElementById('homeLocation'),
                 options
             );
 
-            autocompleteNew = new google.maps.places.Autocomplete(
+            window.autocompleteNew = new google.maps.places.Autocomplete(
                 document.getElementById('newLocation'),
                 options
             );
 
+            // Prevent form submission on enter
             document.querySelectorAll('.location-input').forEach(input => {
                 input.addEventListener('keydown', e => {
                     if (e.key === 'Enter') e.preventDefault();
                 });
             });
+        };
 
-            document.getElementById('calculateBtn').addEventListener('click', handleCalculateClick);
-        }
-
+        // Handle button click
         async function handleCalculateClick() {
             console.log('Button clicked');
 
             try {
-                const homePlace = autocompleteHome.getPlace();
-                const newPlace = autocompleteNew.getPlace();
+                const homePlace = window.autocompleteHome.getPlace();
+                const newPlace = window.autocompleteNew.getPlace();
 
                 if (!homePlace || !newPlace) {
                     showResult('Please select valid cities from the dropdown suggestions.');
@@ -85,6 +88,7 @@
                 const startTime = document.getElementById('startTime').value;
                 const endTime = document.getElementById('endTime').value;
 
+                // Get timezone data for both locations
                 const homeTz = await getTimezone(
                     homePlace.geometry.location.lat(),
                     homePlace.geometry.location.lng()
@@ -95,20 +99,24 @@
                     newPlace.geometry.location.lng()
                 );
 
+                // Calculate the time difference between home and destination
                 const homeOffset = homeTz.rawOffset + homeTz.dstOffset;
                 const newOffset = newTz.rawOffset + newTz.dstOffset;
                 const diffInHours = (newOffset - homeOffset) / 3600;
 
+                // Create date objects for the times
                 const now = new Date();
                 const [startHours, startMinutes] = startTime.split(':').map(Number);
                 const [endHours, endMinutes] = endTime.split(':').map(Number);
 
+                // Adjust for timezone difference
                 const startDate = new Date(now);
                 startDate.setHours(startHours - diffInHours, startMinutes, 0, 0);
 
                 const endDate = new Date(now);
                 endDate.setHours(endHours - diffInHours, endMinutes, 0, 0);
 
+                // Convert to destination timezone
                 const convertedStart = startDate.toLocaleTimeString('en-US', {
                     timeZone: newTz.timeZoneId,
                     hour: 'numeric',
