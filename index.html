@@ -8,14 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <!-- Add initMap function before loading Google Maps API -->
-    <script>
-        function initMap() {
-            // This function will be called when Google Maps loads
-            console.log('Google Maps loaded');
-            initializeApp();
-        }
-    </script>
 </head>
 <body>
     <main class="hero">
@@ -51,9 +43,35 @@
         </div>
     </main>
 
-    <!-- Load your script first -->
-    <script src="script.js"></script>
-    <!-- Load Google Maps API with callback -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places&callback=initMap" async defer></script>
+    <!-- Load Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
+
+    <!-- Initialize the app -->
+    <script>
+        // Initialize when document is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const options = {
+                types: ['(cities)'],
+                fields: ['formatted_address', 'geometry', 'name']
+            };
+
+            // Initialize autocomplete
+            window.autocompleteHome = new google.maps.places.Autocomplete(
+                document.getElementById('homeLocation'),
+                options
+            );
+
+            window.autocompleteNew = new google.maps.places.Autocomplete(
+                document.getElementById('newLocation'),
+                options
+            );
+
+            // Add button click handler
+            document.getElementById('convertButton').addEventListener('click', calculateHours);
+        });
+    </script>
+
+    <!-- Load your application script -->
+    <script src="/script.js"></script>
 </body>
 </html>
