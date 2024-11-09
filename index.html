@@ -178,33 +178,19 @@
                     newPlace.geometry.location.lng()
                 );
 
-                const homeOffset = homeTz.rawOffset + homeTz.dstOffset;
-                const newOffset = newTz.rawOffset + newTz.dstOffset;
-                const diffInHours = (newOffset - homeOffset) / 3600;
-
+                // Create a Date object for today in the home timezone
                 const now = new Date();
                 const [startHours, startMinutes] = startTime.split(':').map(Number);
                 const [endHours, endMinutes] = endTime.split(':').map(Number);
 
-                const startDate = new Date(now);
-                startDate.setHours(startHours - diffInHours, startMinutes, 0, 0);
+                // Create Date objects for start and end times in the home timezone
+                const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHours, startMinutes);
+                const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHours, endMinutes);
 
-                const endDate = new Date(now);
-                endDate.setHours(endHours - diffInHours, endMinutes, 0, 0);
-
-                const convertedStart = startDate.toLocaleTimeString('en-US', {
-                    timeZone: newTz.timeZoneId,
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                });
-
-                const convertedEnd = endDate.toLocaleTimeString('en-US', {
-                    timeZone: newTz.timeZoneId,
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                });
+                // Convert times to the destination timezone
+                const options = { timeZone: newTz.timeZoneId, hour: 'numeric', minute: '2-digit', hour12: true };
+                const convertedStart = startDate.toLocaleString('en-US', options);
+                const convertedEnd = endDate.toLocaleString('en-US', options);
 
                 showResult(`
                     <div class="result-text">My working hours will be:</div>
