@@ -134,10 +134,111 @@
         </div>
     </main>
 
-    <!-- The script section remains unchanged -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
     <script>
-        // ... (keep the existing JavaScript code here)
+        let autocompleteHome, autocompleteNew;
+
+        function initAutocomplete() {
+            const options = {
+                types: ['(cities)'],
+                fields: ['formatted_address', 'geometry', 'name']
+            };
+
+            autocompleteHome = new google.maps.places.Autocomplete(
+                document.getElementById('homeLocation'),
+                options
+            );
+
+            autocompleteNew = new google.maps.places.Autocomplete(
+                document.getElementById('newLocation'),
+                options
+            );
+
+            document.querySelectorAll('.location-input').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') e.preventDefault();
+                });
+            });
+
+            document.getElementById('calculateBtn').addEventListener('click', handleCalculateClick);
+        }
+
+        async function handleCalculateClick() {
+            try {
+                const homePlace = autocompleteHome.getPlace();
+                const newPlace = autocompleteNew.getPlace();
+
+                if (!homePlace || !newPlace) {
+                    showResult('Please select valid cities from the dropdown suggestions.');
+                    return;
+                }
+
+                const startTime = document.getElementById('startTime').value;
+                const endTime = document.getElementById('endTime').value;
+
+                const homeTz = await getTimezone(
+                    homePlace.geometry.location.lat(),
+                    homePlace.geometry.location.lng()
+                );
+
+                const newTz = await getTimezone(
+                    newPlace.geometry.location.lat(),
+                    newPlace.geometry.location.lng()
+                );
+
+                // Create Date objects for start and end times
+                const now = new Date();
+                const [startHours, startMinutes] = startTime.split(':').map(Number);
+                const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+                const homeStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHours, startMinutes);
+                const homeEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHours, endMinutes);
+
+                // Convert times to the destination timezone
+                const newStart = new Date(homeStart.getTime() + (newTz.rawOffset - homeTz.rawOffset) * 1000);
+                const newEnd = new Date(homeEnd.getTime() + (newTz.rawOffset - homeTz.rawOffset) * 1000);
+
+                const formatOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+
+                showResult(`
+                    <div class="result-text">Working hours:</div>
+                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}): ${homeStart.toLocaleTimeString('en-US', formatOptions)} - ${homeEnd.toLocaleTimeString('en-US', formatOptions)}</div>
+                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}): ${newStart.toLocaleTimeString('en-US', formatOptions)} - ${newEnd.toLocaleTimeString('en-US', formatOptions)}</div>
+                `);
+
+            } catch (error) {
+                console.error('Calculation error:', error);
+                showResult('Error calculating time difference. Please try again.');
+            }
+        }
+
+        async function getTimezone(lat, lng) {
+            try {
+                const timestamp = Math.floor(Date.now() / 1000);
+                const response = await fetch(
+                    `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${lng}&timestamp=${timestamp}&key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU`
+                );
+
+                if (!response.ok) throw new Error('Timezone API request failed');
+
+                const data = await response.json();
+                if (data.status !== 'OK') throw new Error(data.status);
+
+                return data;
+            } catch (error) {
+                console.error('Timezone fetch error:', error);
+                throw error;
+            }
+        }
+
+        function showResult(message) {
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.classList.remove('result-hidden');
+            result.classList.add('active');
+        }
+
+        window.onload = initAutocomplete;
     </script>
 </body>
 </html>
