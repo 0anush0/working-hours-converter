@@ -179,28 +179,20 @@
                     newPlace.geometry.location.lng()
                 );
 
-                // Create a Date object for the current time
-                const now = new Date();
-                const [startHours, startMinutes] = startTime.split(':').map(Number);
-                const [endHours, endMinutes] = endTime.split(':').map(Number);
-
-                // Create Date objects for start and end times
-                const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHours, startMinutes);
-                const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHours, endMinutes);
+                // Create Date objects for start and end times in the home timezone
+                const homeStart = new Date(`2024-01-01T${startTime}:00${homeTz.rawOffset / 3600}:00`);
+                const homeEnd = new Date(`2024-01-01T${endTime}:00${homeTz.rawOffset / 3600}:00`);
 
                 // Convert times to the destination timezone
-                const homeOptions = { timeZone: homeTz.timeZoneId, hour: 'numeric', minute: '2-digit', hour12: true };
-                const newOptions = { timeZone: newTz.timeZoneId, hour: 'numeric', minute: '2-digit', hour12: true };
+                const newStart = new Date(homeStart.getTime() + (newTz.rawOffset - homeTz.rawOffset) * 1000);
+                const newEnd = new Date(homeEnd.getTime() + (newTz.rawOffset - homeTz.rawOffset) * 1000);
 
-                const homeStart = startDate.toLocaleString('en-US', homeOptions);
-                const homeEnd = endDate.toLocaleString('en-US', homeOptions);
-                const newStart = startDate.toLocaleString('en-US', newOptions);
-                const newEnd = endDate.toLocaleString('en-US', newOptions);
+                const formatOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
 
                 showResult(`
                     <div class="result-text">Working hours:</div>
-                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}): ${homeStart} - ${homeEnd}</div>
-                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}): ${newStart} - ${newEnd}</div>
+                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}): ${homeStart.toLocaleTimeString('en-US', formatOptions)} - ${homeEnd.toLocaleTimeString('en-US', formatOptions)}</div>
+                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}): ${newStart.toLocaleTimeString('en-US', formatOptions)} - ${newEnd.toLocaleTimeString('en-US', formatOptions)}</div>
                 `);
 
             } catch (error) {
