@@ -4,40 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Working Hours</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Microsoft+Sans+Serif&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'VT323', monospace;
-            background-color: #C0C0C0;
-            color: #000080;
+            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+            background-color: #008080;
+            color: #000000;
             line-height: 1.6;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            background-color: #C0C0C0;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 2px;
+        }
+        .title-bar {
+            background-color: #000080;
+            color: #FFFFFF;
+            padding: 2px 4px;
+            font-weight: bold;
+            font-size: 14px;
         }
         h1 {
-            font-size: 32px;
-            color: #000080;
-            text-align: center;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px #FFA500;
+            font-size: 20px;
+            color: #000000;
+            margin: 10px 0;
         }
         .subtitle {
-            text-align: center;
-            color: #000080;
+            color: #000000;
             margin-bottom: 20px;
-            font-size: 18px;
+            font-size: 14px;
         }
         .card {
-            background-color: #FFFFFF;
-            border: 3px solid #000080;
-            padding: 20px;
+            background-color: #C0C0C0;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 10px;
             margin-bottom: 20px;
-            box-shadow: 5px 5px #FFA500;
         }
         .input-group {
             margin-bottom: 15px;
@@ -45,18 +54,17 @@
         label {
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 18px;
+            font-size: 14px;
         }
         input[type="text"],
         input[type="time"] {
-            width: calc(100% - 10px);
-            padding: 5px;
+            width: calc(100% - 6px);
+            padding: 2px;
             background-color: #FFFFFF;
-            border: 2px solid #000080;
-            color: #000080;
-            font-family: 'VT323', monospace;
-            font-size: 18px;
+            border: 2px inset #808080;
+            color: #000000;
+            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+            font-size: 14px;
         }
         .time-wrapper {
             display: flex;
@@ -64,22 +72,28 @@
         }
         .time-separator {
             margin: 0 10px;
-            font-size: 18px;
+            font-size: 14px;
         }
         .convert-btn {
             display: block;
             width: 100%;
-            background-color: #FFA500;
-            color: #000080;
-            border: 2px solid #000080;
-            padding: 10px;
-            font-size: 20px;
-            font-family: 'VT323', monospace;
+            background-color: #C0C0C0;
+            color: #000000;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 4px;
+            font-size: 14px;
+            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
             cursor: pointer;
-            transition: background-color 0.3s;
+            position: relative;
+            outline: 1px solid #000000;
         }
-        .convert-btn:hover {
-            background-color: #FFD700;
+        .convert-btn:active {
+            border: 2px solid #808080;
+            border-right-color: #FFFFFF;
+            border-bottom-color: #FFFFFF;
+            outline: 1px solid #000000;
         }
         .result-hidden {
             display: none;
@@ -90,12 +104,10 @@
         .result-text {
             font-weight: bold;
             margin-bottom: 10px;
-            font-size: 20px;
+            font-size: 14px;
         }
         .converted-time {
-            font-size: 18px;
-            font-weight: bold;
-            color: #000080;
+            font-size: 14px;
             margin-bottom: 10px;
         }
     </style>
@@ -103,6 +115,7 @@
 <body>
     <main class="hero">
         <div class="container">
+            <div class="title-bar">Working Hours</div>
             <h1>Working Hours</h1>
             <p class="subtitle">See your working hours in different locations</p>
 
@@ -136,6 +149,7 @@
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
     <script>
+        // The JavaScript remains unchanged
         let autocompleteHome, autocompleteNew;
 
         function initAutocomplete() {
