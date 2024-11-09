@@ -1,109 +1,112 @@
-body {
-    font-family: 'Courier Prime', monospace;
-    background-color: #000000;
-    color: #00FF00;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-h1 {
-    font-size: 24px;
-    color: #FFFFFF;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.subtitle {
-    text-align: center;
-    color: #00FF00;
-    margin-bottom: 20px;
-}
-
-.card {
-    background-color: #000000;
-    border: 1px solid #00FF00;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.input-group {
-    margin-bottom: 15px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-input[type="text"],
-input[type="time"] {
-    width: 100%;
-    padding: 5px;
-    background-color: #000000;
-    border: 1px solid #00FF00;
-    color: #00FF00;
-    font-family: 'Courier Prime', monospace;
-    font-size: 14px;
-}
-
-.time-wrapper {
-    display: flex;
-    align-items: center;
-}
-
-.time-separator {
-    margin: 0 10px;
-}
-
-.convert-btn {
-    display: block;
-    width: 100%;
-    background-color: #00FF00;
-    color: #000000;
-    border: none;
-    padding: 10px;
-    font-size: 16px;
-    font-family: 'Courier Prime', monospace;
-    cursor: pointer;
-}
-
-.convert-btn:hover {
-    background-color: #00CC00;
-}
-
-.result-hidden {
-    display: none;
-}
-
-.result.active {
-    display: block;
-}
-
-.result-text {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.converted-time {
-    font-size: 18px;
-    font-weight: bold;
-    color: #FFFFFF;
-}
-
-@media (max-width: 480px) {
-    .container {
+<style>
+    body {
+        font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+        background-color: #008080;
+        color: #000000;
+        line-height: 1.4;
+        margin: 0;
         padding: 10px;
     }
-
-    h1 {
-        font-size: 20px;
+    .container {
+        max-width: 500px;
+        margin: auto;
+        background-color: #C0C0C0;
+        border: 2px solid #FFFFFF;
+        border-right-color: #808080;
+        border-bottom-color: #808080;
+        padding: 5px;
     }
-}
+    .title-bar {
+        background-color: #000080;
+        color: #FFFFFF;
+        padding: 4px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    h1 {
+        font-size: 18px;
+        color: #000000;
+        margin: 0 0 10px;
+    }
+    .subtitle {
+        color: #000000;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+    .card {
+        background-color: #C0C0C0;
+        border: 2px solid #FFFFFF;
+        border-right-color: #808080;
+        border-bottom-color: #808080;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    .card:last-child {
+        margin-bottom: 0;
+    }
+    .input-group {
+        margin-bottom: 10px;
+    }
+    label {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 14px;
+    }
+    input[type="text"],
+    input[type="time"] {
+        width: calc(100% - 6px);
+        padding: 2px;
+        background-color: #FFFFFF;
+        border: 2px inset #808080;
+        color: #000000;
+        font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+        font-size: 14px;
+    }
+    .time-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .time-separator {
+        margin: 0 10px;
+        font-size: 14px;
+    }
+    .convert-btn {
+        display: block;
+        width: 100%;
+        background-color: #C0C0C0;
+        color: #000000;
+        border: 2px solid #FFFFFF;
+        border-right-color: #808080;
+        border-bottom-color: #808080;
+        padding: 6px;
+        font-size: 12px;
+        font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+        cursor: pointer;
+        position: relative;
+        outline: 1px solid #000000;
+        margin-top: 10px;
+    }
+    .convert-btn:active {
+        border: 2px solid #808080;
+        border-right-color: #FFFFFF;
+        border-bottom-color: #FFFFFF;
+        outline: 1px solid #000000;
+    }
+    .result-hidden {
+        display: none;
+    }
+    .result.active {
+        display: block;
+        margin-top: 10px;
+    }
+    .result-text {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+    .converted-time {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+</style>
