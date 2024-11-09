@@ -5,7 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Working Hours</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Courier Prime', monospace;
+            background-color: #000000;
+            color: #00FF00;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #00FF00;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #000000;
+            border: 1px solid #00FF00;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="time"] {
+            width: 100%;
+            padding: 5px;
+            background-color: #000000;
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            font-family: 'Courier Prime', monospace;
+            font-size: 14px;
+        }
+        .time-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .time-separator {
+            margin: 0 10px;
+        }
+        .convert-btn {
+            display: block;
+            width: 100%;
+            background-color: #00FF00;
+            color: #000000;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Courier Prime', monospace;
+            cursor: pointer;
+        }
+        .convert-btn:hover {
+            background-color: #00CC00;
+        }
+        .result-hidden {
+            display: none;
+        }
+        .result.active {
+            display: block;
+        }
+        .result-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .converted-time {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+    </style>
 </head>
 <body>
     <main class="hero">
@@ -15,7 +100,7 @@
 
             <div class="card">
                 <div class="input-group">
-                    <label>My work is based in:</label>
+                    <label for="homeLocation">My work is based in:</label>
                     <input type="text" id="homeLocation" placeholder="Enter your city" class="location-input">
                 </div>
 
@@ -31,54 +116,49 @@
 
             <div class="card">
                 <div class="input-group">
-                    <label>If I travel to:</label>
+                    <label for="newLocation">If I travel to:</label>
                     <input type="text" id="newLocation" placeholder="Enter destination city" class="location-input">
                 </div>
-                <button onclick="handleCalculateClick()" class="convert-btn">Show Working Hours</button>
+                <button id="calculateBtn" class="convert-btn">Show Working Hours</button>
             </div>
 
             <div id="result" class="card result-hidden"></div>
         </div>
     </main>
 
-    <!-- Load Google Maps API first -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNjIHQsSdFqBYOO0LYkJNluGDXcNw_meU&libraries=places"></script>
-
-    <!-- Initialize the app -->
     <script>
-        // Initialize Google Places Autocomplete
-        window.onload = function() {
+        let autocompleteHome, autocompleteNew;
+
+        function initAutocomplete() {
             const options = {
                 types: ['(cities)'],
                 fields: ['formatted_address', 'geometry', 'name']
             };
 
-            // Initialize autocomplete for both inputs
-            window.autocompleteHome = new google.maps.places.Autocomplete(
+            autocompleteHome = new google.maps.places.Autocomplete(
                 document.getElementById('homeLocation'),
                 options
             );
 
-            window.autocompleteNew = new google.maps.places.Autocomplete(
+            autocompleteNew = new google.maps.places.Autocomplete(
                 document.getElementById('newLocation'),
                 options
             );
 
-            // Prevent form submission on enter
             document.querySelectorAll('.location-input').forEach(input => {
-                input.addEventListener('keydown', e => {
+                input.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') e.preventDefault();
                 });
             });
-        };
 
-        // Handle button click
+            document.getElementById('calculateBtn').addEventListener('click', handleCalculateClick);
+        }
+
         async function handleCalculateClick() {
-            console.log('Button clicked');
-
             try {
-                const homePlace = window.autocompleteHome.getPlace();
-                const newPlace = window.autocompleteNew.getPlace();
+                const homePlace = autocompleteHome.getPlace();
+                const newPlace = autocompleteNew.getPlace();
 
                 if (!homePlace || !newPlace) {
                     showResult('Please select valid cities from the dropdown suggestions.');
@@ -88,7 +168,6 @@
                 const startTime = document.getElementById('startTime').value;
                 const endTime = document.getElementById('endTime').value;
 
-                // Get timezone data for both locations
                 const homeTz = await getTimezone(
                     homePlace.geometry.location.lat(),
                     homePlace.geometry.location.lng()
@@ -99,24 +178,20 @@
                     newPlace.geometry.location.lng()
                 );
 
-                // Calculate the time difference between home and destination
                 const homeOffset = homeTz.rawOffset + homeTz.dstOffset;
                 const newOffset = newTz.rawOffset + newTz.dstOffset;
                 const diffInHours = (newOffset - homeOffset) / 3600;
 
-                // Create date objects for the times
                 const now = new Date();
                 const [startHours, startMinutes] = startTime.split(':').map(Number);
                 const [endHours, endMinutes] = endTime.split(':').map(Number);
 
-                // Adjust for timezone difference
                 const startDate = new Date(now);
                 startDate.setHours(startHours - diffInHours, startMinutes, 0, 0);
 
                 const endDate = new Date(now);
                 endDate.setHours(endHours - diffInHours, endMinutes, 0, 0);
 
-                // Convert to destination timezone
                 const convertedStart = startDate.toLocaleTimeString('en-US', {
                     timeZone: newTz.timeZoneId,
                     hour: 'numeric',
@@ -129,16 +204,6 @@
                     hour: 'numeric',
                     minute: '2-digit',
                     hour12: true
-                });
-
-                console.log('Time conversion:', {
-                    original: `${startTime}-${endTime}`,
-                    converted: `${convertedStart}-${convertedEnd}`,
-                    diffInHours,
-                    homeOffset,
-                    newOffset,
-                    homeTz,
-                    newTz
                 });
 
                 showResult(`
@@ -174,8 +239,11 @@
         function showResult(message) {
             const result = document.getElementById('result');
             result.innerHTML = message;
+            result.classList.remove('result-hidden');
             result.classList.add('active');
         }
+
+        window.onload = initAutocomplete;
     </script>
 </body>
 </html>
