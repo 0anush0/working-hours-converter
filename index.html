@@ -186,6 +186,13 @@
             document.getElementById('calculateBtn').addEventListener('click', handleCalculateClick);
         }
 
+        function getNextMonday() {
+            const now = new Date();
+            const daysUntilMonday = (1 + 7 - now.getDay()) % 7;
+            const nextMonday = new Date(now.getTime() + daysUntilMonday * 24 * 60 * 60 * 1000);
+            return nextMonday;
+        }
+
         async function handleCalculateClick() {
             try {
                 const homePlace = autocompleteHome.getPlace();
@@ -209,30 +216,33 @@
                     newPlace.geometry.location.lng()
                 );
 
-                // Create Date objects for start and end times in UTC
-                const now = new Date();
+                // Create Date objects for start and end times on next Monday in UTC
+                const nextMonday = getNextMonday();
                 const [startHours, startMinutes] = startTime.split(':').map(Number);
                 const [endHours, endMinutes] = endTime.split(':').map(Number);
 
-                const homeStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), startHours, startMinutes));
-                const homeEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), endHours, endMinutes));
+                const homeStart = new Date(Date.UTC(nextMonday.getUTCFullYear(), nextMonday.getUTCMonth(), nextMonday.getUTCDate(), startHours, startMinutes));
+                const homeEnd = new Date(Date.UTC(nextMonday.getUTCFullYear(), nextMonday.getUTCMonth(), nextMonday.getUTCDate(), endHours, endMinutes));
 
-                // Adjust for home timezone offset
-                homeStart.setUTCMinutes(homeStart.getUTCMinutes() - homeTz.rawOffset / 60);
-                homeEnd.setUTCMinutes(homeEnd.getUTCMinutes() - homeTz.rawOffset / 60);
+                // Adjust for home timezone offset and DST
+                const homeDstOffset = homeTz.dstOffset || 0;
+                homeStart.setUTCMinutes(homeStart.getUTCMinutes() - (homeTz.rawOffset + homeDstOffset) / 60);
+                homeEnd.setUTCMinutes(homeEnd.getUTCMinutes() - (homeTz.rawOffset + homeDstOffset) / 60);
 
                 // Convert times to the destination timezone
-                const newStart = new Date(homeStart.getTime());
-                const newEnd = new Date(homeEnd.getTime());
-                newStart.setUTCMinutes(newStart.getUTCMinutes() + newTz.rawOffset / 60);
-                newEnd.setUTCMinutes(newEnd.getUTCMinutes() + newTz.rawOffset / 60);
+                const newDstOffset = newTz.dstOffset || 0;
+                const newStart = new Date(homeStart.getTime() + (newTz.rawOffset + newDstOffset) * 1000);
+                const newEnd = new Date(homeEnd.getTime() + (newTz.rawOffset + newDstOffset) * 1000);
 
-                const formatOptions = { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+                const formatOptions = { weekday: 'long', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' };
 
-                let homeStartString = homeStart.toLocaleTimeString('en-US', formatOptions);
-                let homeEndString = homeEnd.toLocaleTimeString('en-US', formatOptions);
-                let newStartString = newStart.toLocaleTimeString('en-US', formatOptions);
-                let newEndString = newEnd.toLocaleTimeString('en-US', formatOptions);
+                let homeStartString = homeStart.toLocaleString('en-US', formatOptions);
+                let homeEndString = homeEnd.toLocaleString('en-US', formatOptions);
+                let newStartString = newStart.toLocaleString('en-US', formatOptions);
+                let newEndString = newEnd.toLocaleString('en-US', formatOptions);
+
+                // Remove day name from home end time
+                homeEndString = homeEndString.split(', ')[1];
 
                 if (homeEnd < homeStart) {
                     homeEndString += '<sup>+1</sup>';
