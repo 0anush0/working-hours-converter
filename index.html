@@ -234,22 +234,16 @@
                 const newStart = new Date(homeStart.getTime() + (newTz.rawOffset + newDstOffset) * 1000);
                 const newEnd = new Date(homeEnd.getTime() + (newTz.rawOffset + newDstOffset) * 1000);
 
-                const formatOptions = { weekday: 'long', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+                const formatOptions = { weekday: 'long', hour: 'numeric', minute: '2-digit', hour12: true };
+                const timeOnlyOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
 
                 let homeStartString = homeStart.toLocaleString('en-US', formatOptions);
-                let homeEndString = homeEnd.toLocaleString('en-US', formatOptions);
+                let homeEndString = homeEnd.toLocaleString('en-US', timeOnlyOptions);
                 let newStartString = newStart.toLocaleString('en-US', formatOptions);
-                let newEndString = newEnd.toLocaleString('en-US', formatOptions);
-
-                // Remove day name from home end time
-                homeEndString = homeEndString.split(', ')[1];
-
-                if (homeEnd < homeStart) {
-                    homeEndString += '<sup>+1</sup>';
-                }
+                let newEndString = newEnd.toLocaleString('en-US', timeOnlyOptions);
 
                 if (newEnd < newStart) {
-                    newEndString += '<sup>+1</sup>';
+                    newEndString = newEnd.toLocaleString('en-US', formatOptions);
                 }
 
                 showResult(`
