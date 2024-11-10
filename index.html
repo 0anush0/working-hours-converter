@@ -5,118 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Working Hours</title>
     <link href="https://fonts.googleapis.com/css2?family=Microsoft+Sans+Serif&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
-            background-color: #008080;
-            color: #000000;
-            line-height: 1.4;
-            margin: 0;
-            padding: 10px;
-        }
-        .container {
-            max-width: 500px;
-            margin: auto;
-            background-color: #C0C0C0;
-            border: 2px solid #FFFFFF;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            padding: 5px;
-        }
-        .title-bar {
-            background-color: #000080;
-            color: #FFFFFF;
-            padding: 4px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .subtitle {
-            color: #000000;
-            margin: 8px 0;
-            font-size: 14px;
-        }
-        .card {
-            background-color: #C0C0C0;
-            border: 2px solid #FFFFFF;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            padding: 8px;
-            margin-bottom: 10px;
-        }
-        .card:last-child {
-            margin-bottom: 0;
-        }
-        .input-group {
-            margin-bottom: 10px;
-        }
-        label {
-            display: block;
-            margin-bottom: 3px;
-            font-size: 14px;
-        }
-        input[type="text"],
-        input[type="time"] {
-            width: calc(100% - 6px);
-            padding: 2px;
-            background-color: #FFFFFF;
-            border: 2px inset #808080;
-            color: #000000;
-            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
-            font-size: 14px;
-        }
-        .time-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .time-separator {
-            margin: 0 10px;
-            font-size: 14px;
-        }
-        .convert-btn {
-            display: block;
-            width: 100%;
-            background-color: #C0C0C0;
-            color: #000000;
-            border: 2px solid #FFFFFF;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            padding: 6px;
-            font-size: 12px;
-            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
-            position: relative;
-            outline: 1px solid #000000;
-            margin-top: 10px;
-        }
-        .convert-btn:active {
-            border: 2px solid #808080;
-            border-right-color: #FFFFFF;
-            border-bottom-color: #FFFFFF;
-            outline: 1px solid #000000;
-        }
-        .result-hidden {
-            display: none;
-        }
-        .result.active {
-            display: block;
-            margin-top: 10px;
-        }
-        .result-text {
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 15px;
-        }
-        .converted-time {
-            font-size: 14px;
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-        #map {
-            height: 200px;
-            width: 100%;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <main class="hero">
@@ -249,8 +138,10 @@
 
                 showResult(`
                     <div class="result-text">Working hours:</div>
-                    <div class="converted-time"><strong>${homePlace.name}</strong> (${homeTz.timeZoneName}):<br>${homeStartString} - ${homeEndString}</div>
-                    <div class="converted-time"><strong>${newPlace.name}</strong> (${newTz.timeZoneName}):<br>${newStartString} - ${newEndString}</div>
+                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}):</div>
+                    <div class="converted-time"><strong>${homeStartString} - ${homeEndString}</strong></div>
+                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}):</div>
+                    <div class="converted-time"><strong>${newStartString} - ${newEndString}</strong></div>
                 `);
 
                 calculateDistance(homePlace, newPlace);
