@@ -110,6 +110,11 @@
             font-size: 12px;
             margin-bottom: 10px;
         }
+        #map {
+            height: 200px;
+            width: 100%;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -143,11 +148,17 @@
             </div>
 
             <div id="result" class="card result-hidden"></div>
+
+            <div id="mapSection" class="card result-hidden">
+                <div class="result-text">Distance Map:</div>
+                <div id="map"></div>
+                <div id="distance" class="converted-time"></div>
+            </div>
         </div>
     </main>
 
     <script>
-        let autocompleteHome, autocompleteNew;
+        let autocompleteHome, autocompleteNew, map, distanceService;
 
         function initMap() {
             const options = {
@@ -172,6 +183,13 @@
             });
 
             document.getElementById('calculateBtn').addEventListener('click', handleCalculateClick);
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 3,
+                center: {lat: 0, lng: 0}
+            });
+
+            distanceService = new google.maps.DistanceMatrixService();
         }
 
         async function handleCalculateClick() {
@@ -233,10 +251,44 @@
                     <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}): ${newStartString} - ${newEndString}</div>
                 `);
 
+                calculateDistance(homePlace, newPlace);
+
+                document.getElementById('mapSection').classList.remove('result-hidden');
+                document.getElementById('mapSection').classList.add('active');
+
             } catch (error) {
                 console.error('Calculation error:', error);
                 showResult('Error calculating time difference. Please try again.');
             }
+        }
+
+        function calculateDistance(origin, destination) {
+            const request = {
+                origins: [origin.geometry.location],
+                destinations: [destination.geometry.location],
+                travelMode: 'DRIVING',
+                unitSystem: google.maps.UnitSystem.METRIC
+            };
+
+            distanceService.getDistanceMatrix(request, (response, status) => {
+                if (status === 'OK') {
+                    const distance = response.rows[0].elements[0].distance.text;
+                    document.getElementById('distance').textContent = `Distance: ${distance}`;
+
+                    const bounds = new google.maps.LatLngBounds();
+                    bounds.extend(origin.geometry.location);
+                    bounds.extend(destination.geometry.location);
+                    map.fitBounds(bounds);
+
+                    new google.maps.Marker({position: origin.geometry.location, map: map});
+                    new google.maps.Marker({position: destination.geometry.location, map: map});
+
+                    new google.maps.Polyline({
+                        path: [origin.geometry.location, destination.geometry.location],
+                        map: map
+                    });
+                }
+            });
         }
 
         async function getTimezone(lat, lng) {
