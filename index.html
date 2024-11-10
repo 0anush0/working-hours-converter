@@ -218,7 +218,8 @@
                     endTime
                 );
 
-                const formatOptions = { weekday: 'long', hour: 'numeric', minute: '2-digit', hour12: true };
+                const homeOffset = moment.tz(homeTz.timeZoneId).format('Z');
+                const newOffset = moment.tz(newTz.timeZoneId).format('Z');
 
                 let homeStartString = homeStart.format('dddd h:mm A');
                 let homeEndString = homeEnd.format('h:mm A');
@@ -231,9 +232,9 @@
 
                 showResult(`
                     <div class="result-text">Working hours:</div>
-                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}):</div>
+                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}, UTC${homeOffset}):</div>
                     <div class="converted-time"><strong>${homeStartString} - ${homeEndString}</strong></div>
-                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}):</div>
+                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}, UTC${newOffset}):</div>
                     <div class="converted-time"><strong>${newStartString} - ${newEndString}</strong></div>
                 `);
 
