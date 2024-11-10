@@ -5,7 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Working Hours</title>
     <link href="https://fonts.googleapis.com/css2?family=Microsoft+Sans+Serif&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+            background-color: #008080;
+            color: #000000;
+            line-height: 1.4;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background-color: #C0C0C0;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 5px;
+        }
+        .title-bar {
+            background-color: #000080;
+            color: #FFFFFF;
+            padding: 4px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .subtitle {
+            color: #000000;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .card {
+            background-color: #C0C0C0;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .card:last-child {
+            margin-bottom: 0;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="time"] {
+            width: calc(100% - 6px);
+            padding: 2px;
+            background-color: #FFFFFF;
+            border: 2px inset #808080;
+            color: #000000;
+            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+            font-size: 14px;
+        }
+        .time-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .time-separator {
+            margin: 0 10px;
+            font-size: 14px;
+        }
+        .convert-btn {
+            display: block;
+            width: 100%;
+            background-color: #C0C0C0;
+            color: #000000;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 6px;
+            font-size: 12px;
+            font-family: 'Microsoft Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+            position: relative;
+            outline: 1px solid #000000;
+            margin-top: 10px;
+        }
+        .convert-btn:active {
+            border: 2px solid #808080;
+            border-right-color: #FFFFFF;
+            border-bottom-color: #FFFFFF;
+            outline: 1px solid #000000;
+        }
+        .result-hidden {
+            display: none;
+        }
+        .result.active {
+            display: block;
+            margin-top: 10px;
+        }
+        .result-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .converted-time {
+            font-size: 14px;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+    </style>
 </head>
 <body>
     <main class="hero">
@@ -38,17 +144,11 @@
             </div>
 
             <div id="result" class="card result-hidden"></div>
-
-            <div id="mapSection" class="card result-hidden">
-                <div class="result-text">Distance Map:</div>
-                <div id="map"></div>
-                <div id="distance" class="converted-time"></div>
-            </div>
         </div>
     </main>
 
     <script>
-        let autocompleteHome, autocompleteNew, map, distanceService;
+        let autocompleteHome, autocompleteNew;
 
         function initMap() {
             const options = {
@@ -73,14 +173,6 @@
             });
 
             document.getElementById('calculateBtn').addEventListener('click', handleCalculateClick);
-
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 3,
-                center: {lat: 0, lng: 0},
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            });
-
-            distanceService = new google.maps.DistanceMatrixService();
         }
 
         async function handleCalculateClick() {
@@ -144,61 +236,10 @@
                     <div class="converted-time"><strong>${newStartString} - ${newEndString}</strong></div>
                 `);
 
-                calculateDistance(homePlace, newPlace);
-
-                document.getElementById('mapSection').classList.remove('result-hidden');
-                document.getElementById('mapSection').classList.add('active');
-
             } catch (error) {
                 console.error('Calculation error:', error);
                 showResult('Error calculating time difference. Please try again.');
             }
-        }
-
-        function calculateDistance(origin, destination) {
-            const request = {
-                origins: [origin.geometry.location],
-                destinations: [destination.geometry.location],
-                travelMode: 'DRIVING',
-                unitSystem: google.maps.UnitSystem.METRIC
-            };
-
-            distanceService.getDistanceMatrix(request, (response, status) => {
-                if (status === 'OK') {
-                    const distance = response.rows[0].elements[0].distance.text;
-                    document.getElementById('distance').textContent = `Distance: ${distance}`;
-
-                    const bounds = new google.maps.LatLngBounds();
-                    bounds.extend(origin.geometry.location);
-                    bounds.extend(destination.geometry.location);
-                    map.fitBounds(bounds);
-
-                    // Add markers
-                    new google.maps.Marker({
-                        position: origin.geometry.location,
-                        map: map,
-                        title: 'Origin'
-                    });
-
-                    new google.maps.Marker({
-                        position: destination.geometry.location,
-                        map: map,
-                        title: 'Destination'
-                    });
-
-                    // Draw polyline
-                    new google.maps.Polyline({
-                        path: [origin.geometry.location, destination.geometry.location],
-                        geodesic: true,
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 1.0,
-                        strokeWeight: 2,
-                        map: map
-                    });
-                } else {
-                    console.error('Distance Matrix request failed:', status);
-                }
-            });
         }
 
         async function getTimezone(lat, lng) {
