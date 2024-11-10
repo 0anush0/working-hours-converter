@@ -104,11 +104,12 @@
         .result-text {
             font-weight: bold;
             margin-bottom: 10px;
-            font-size: 13px;
+            font-size: 15px;
         }
         .converted-time {
-            font-size: 12px;
+            font-size: 14px;
             margin-bottom: 10px;
+            line-height: 1.6;
         }
         #map {
             height: 200px;
@@ -186,24 +187,12 @@
 
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 3,
-                center: {lat: 0, lng: 0}
+                center: {lat: 0, lng: 0},
+                mapTypeId: google.maps.MapTypeId.ROADMAP
             });
-
-            map.overlays = []; // Initialize the overlays array
 
             distanceService = new google.maps.DistanceMatrixService();
         }
-
-        google.maps.Map.prototype.clearOverlays = function() {
-            if (this.overlays) {
-                for (let i = 0; i < this.overlays.length; i++) {
-                    this.overlays[i].setMap(null);
-                }
-                this.overlays = [];
-            } else {
-                this.overlays = [];
-            }
-        };
 
         async function handleCalculateClick() {
             try {
@@ -260,8 +249,8 @@
 
                 showResult(`
                     <div class="result-text">Working hours:</div>
-                    <div class="converted-time">${homePlace.name} (${homeTz.timeZoneName}): ${homeStartString} - ${homeEndString}</div>
-                    <div class="converted-time">${newPlace.name} (${newTz.timeZoneName}): ${newStartString} - ${newEndString}</div>
+                    <div class="converted-time"><strong>${homePlace.name}</strong> (${homeTz.timeZoneName}):<br>${homeStartString} - ${homeEndString}</div>
+                    <div class="converted-time"><strong>${newPlace.name}</strong> (${newTz.timeZoneName}):<br>${newStartString} - ${newEndString}</div>
                 `);
 
                 calculateDistance(homePlace, newPlace);
@@ -288,55 +277,38 @@
                     const distance = response.rows[0].elements[0].distance.text;
                     document.getElementById('distance').textContent = `Distance: ${distance}`;
 
-                    // Ensure the map is loaded before adding markers
-                    google.maps.event.addListenerOnce(map, 'idle', function() {
-                        // Clear previous markers and polylines
-                        if (map.overlays) {
-                            map.overlays.forEach(overlay => overlay.setMap(null));
-                        }
-                        map.overlays = [];
+                    const bounds = new google.maps.LatLngBounds();
+                    bounds.extend(origin.geometry.location);
+                    bounds.extend(destination.geometry.location);
+                    map.fitBounds(bounds);
 
-                        const bounds = new google.maps.LatLngBounds();
-                        bounds.extend(origin.geometry.location);
-                        bounds.extend(destination.geometry.location);
-                        map.fitBounds(bounds);
+                    // Add markers
+                    new google.maps.Marker({
+                        position: origin.geometry.location,
+                        map: map,
+                        title: 'Origin'
+                    });
 
-                        // Add markers
-                        const originMarker = new google.maps.Marker({
-                            position: origin.geometry.location,
-                            map: map,
-                            title: 'Origin'
-                        });
+                    new google.maps.Marker({
+                        position: destination.geometry.location,
+                        map: map,
+                        title: 'Destination'
+                    });
 
-                        const destinationMarker = new google.maps.Marker({
-                            position: destination.geometry.location,
-                            map: map,
-                            title: 'Destination'
-                        });
-
-                        // Draw polyline
-                        const polyline = new google.maps.Polyline({
-                            path: [origin.geometry.location, destination.geometry.location],
-                            geodesic: true,
-                            strokeColor: '#FF0000',
-                            strokeOpacity: 1.0,
-                            strokeWeight: 2,
-                            map: map
-                        });
-
-                        // Add overlays to the map
-                        map.overlays.push(originMarker, destinationMarker, polyline);
-
-                        console.log('Origin Marker:', originMarker);
-                        console.log('Destination Marker:', destinationMarker);
-                        console.log('Polyline:', polyline);
+                    // Draw polyline
+                    new google.maps.Polyline({
+                        path: [origin.geometry.location, destination.geometry.location],
+                        geodesic: true,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2,
+                        map: map
                     });
                 } else {
                     console.error('Distance Matrix request failed:', status);
                 }
             });
         }
-
 
         async function getTimezone(lat, lng) {
             try {
