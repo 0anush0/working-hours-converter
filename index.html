@@ -158,6 +158,8 @@
         </div>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
     <script>
         let autocompleteHome, autocompleteNew;
 
@@ -186,13 +188,6 @@
             document.getElementById('calculateBtn').addEventListener('click', handleCalculateClick);
         }
 
-        function getNextMonday() {
-            const now = new Date();
-            const daysUntilMonday = (1 + 7 - now.getDay()) % 7;
-            const nextMonday = new Date(now.getTime() + daysUntilMonday * 24 * 60 * 60 * 1000);
-            return nextMonday;
-        }
-
         async function handleCalculateClick() {
             try {
                 const homePlace = autocompleteHome.getPlace();
@@ -216,34 +211,22 @@
                     newPlace.geometry.location.lng()
                 );
 
-                // Create Date objects for start and end times on next Monday in UTC
-                const nextMonday = getNextMonday();
-                const [startHours, startMinutes] = startTime.split(':').map(Number);
-                const [endHours, endMinutes] = endTime.split(':').map(Number);
-
-                const homeStart = new Date(Date.UTC(nextMonday.getUTCFullYear(), nextMonday.getUTCMonth(), nextMonday.getUTCDate(), startHours, startMinutes));
-                const homeEnd = new Date(Date.UTC(nextMonday.getUTCFullYear(), nextMonday.getUTCMonth(), nextMonday.getUTCDate(), endHours, endMinutes));
-
-                // Adjust for home timezone offset and DST
-                const homeDstOffset = homeTz.dstOffset || 0;
-                homeStart.setUTCMinutes(homeStart.getUTCMinutes() - (homeTz.rawOffset + homeDstOffset) / 60);
-                homeEnd.setUTCMinutes(homeEnd.getUTCMinutes() - (homeTz.rawOffset + homeDstOffset) / 60);
-
-                // Convert times to the destination timezone
-                const newDstOffset = newTz.dstOffset || 0;
-                const newStart = new Date(homeStart.getTime() + (newTz.rawOffset + newDstOffset) * 1000);
-                const newEnd = new Date(homeEnd.getTime() + (newTz.rawOffset + newDstOffset) * 1000);
+                const [homeStart, homeEnd, newStart, newEnd] = calculateTime(
+                    homeTz.timeZoneId,
+                    newTz.timeZoneId,
+                    startTime,
+                    endTime
+                );
 
                 const formatOptions = { weekday: 'long', hour: 'numeric', minute: '2-digit', hour12: true };
-                const timeOnlyOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
 
-                let homeStartString = homeStart.toLocaleString('en-US', formatOptions);
-                let homeEndString = homeEnd.toLocaleString('en-US', timeOnlyOptions);
-                let newStartString = newStart.toLocaleString('en-US', formatOptions);
-                let newEndString = newEnd.toLocaleString('en-US', timeOnlyOptions);
+                let homeStartString = homeStart.format('dddd h:mm A');
+                let homeEndString = homeEnd.format('h:mm A');
+                let newStartString = newStart.format('dddd h:mm A');
+                let newEndString = newEnd.format('h:mm A');
 
-                if (newEnd < newStart) {
-                    newEndString = newEnd.toLocaleString('en-US', formatOptions);
+                if (newEnd.date() !== newStart.date()) {
+                    newEndString = newEnd.format('dddd h:mm A');
                 }
 
                 showResult(`
@@ -258,6 +241,22 @@
                 console.error('Calculation error:', error);
                 showResult('Error calculating time difference. Please try again.');
             }
+        }
+
+        function calculateTime(homeTz, newTz, startTime, endTime) {
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+
+            const now = moment().tz(homeTz);
+            const monday = now.clone().day(1).startOf('day');
+
+            const homeStart = monday.clone().hour(startHour).minute(startMinute);
+            const homeEnd = monday.clone().hour(endHour).minute(endMinute);
+
+            const newStart = homeStart.clone().tz(newTz);
+            const newEnd = homeEnd.clone().tz(newTz);
+
+            return [homeStart, homeEnd, newStart, newEnd];
         }
 
         async function getTimezone(lat, lng) {
