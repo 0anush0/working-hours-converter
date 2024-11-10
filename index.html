@@ -288,49 +288,55 @@
                     const distance = response.rows[0].elements[0].distance.text;
                     document.getElementById('distance').textContent = `Distance: ${distance}`;
 
-                    // Clear previous markers and polylines
-                    map.clearOverlays();
+                    // Ensure the map is loaded before adding markers
+                    google.maps.event.addListenerOnce(map, 'idle', function() {
+                        // Clear previous markers and polylines
+                        if (map.overlays) {
+                            map.overlays.forEach(overlay => overlay.setMap(null));
+                        }
+                        map.overlays = [];
 
-                    const bounds = new google.maps.LatLngBounds();
-                    bounds.extend(origin.geometry.location);
-                    bounds.extend(destination.geometry.location);
-                    map.fitBounds(bounds);
+                        const bounds = new google.maps.LatLngBounds();
+                        bounds.extend(origin.geometry.location);
+                        bounds.extend(destination.geometry.location);
+                        map.fitBounds(bounds);
 
-                    // Add markers
-                    const originMarker = new google.maps.Marker({
-                        position: origin.geometry.location,
-                        map: map,
-                        title: 'Origin'
+                        // Add markers
+                        const originMarker = new google.maps.Marker({
+                            position: origin.geometry.location,
+                            map: map,
+                            title: 'Origin'
+                        });
+
+                        const destinationMarker = new google.maps.Marker({
+                            position: destination.geometry.location,
+                            map: map,
+                            title: 'Destination'
+                        });
+
+                        // Draw polyline
+                        const polyline = new google.maps.Polyline({
+                            path: [origin.geometry.location, destination.geometry.location],
+                            geodesic: true,
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 1.0,
+                            strokeWeight: 2,
+                            map: map
+                        });
+
+                        // Add overlays to the map
+                        map.overlays.push(originMarker, destinationMarker, polyline);
+
+                        console.log('Origin Marker:', originMarker);
+                        console.log('Destination Marker:', destinationMarker);
+                        console.log('Polyline:', polyline);
                     });
-
-                    const destinationMarker = new google.maps.Marker({
-                        position: destination.geometry.location,
-                        map: map,
-                        title: 'Destination'
-                    });
-
-                    // Draw polyline
-                    const polyline = new google.maps.Polyline({
-                        path: [origin.geometry.location, destination.geometry.location],
-                        geodesic: true,
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 1.0,
-                        strokeWeight: 2,
-                        map: map
-                    });
-
-                    // Add overlays to the map
-                    map.overlays.push(originMarker, destinationMarker, polyline);
-
-                    // Check if markers and polyline are created successfully
-                    console.log('Origin Marker:', originMarker);
-                    console.log('Destination Marker:', destinationMarker);
-                    console.log('Polyline:', polyline);
                 } else {
                     console.error('Distance Matrix request failed:', status);
                 }
             });
         }
+
 
         async function getTimezone(lat, lng) {
             try {
